@@ -14,21 +14,29 @@
 
 TIM_HandleTypeDef htim3;
 
+/* Variáveis privadas --------------------------------------------------------*/
 int32_t leftEncoderChange = 0, rightEncoderChange = 0;
 int32_t encoderChange = 0, encoderCount = 0;
-
 int32_t leftEncoderOld = 0, rightEncoderOld = 0;
 int32_t leftEncoderCount = 0, rightEncoderCount = 0;
-int32_t distanceLeft = 0, angleLeft = 0;
-int32_t distance_mm = 0;
+int32_t distance = 0;
+
+int32_t oldPosErrorX = 0, posErrorX = 0;
+int32_t oldPosErrorW = 0, posErrorW = 0;
+
+int32_t oldSensorError = 0;
 
 int32_t curSpeedX = 0, curSpeedW = 0;
+
+
+/* Variáveis externas --------------------------------------------------------*/
+int32_t distanceLeft = 0, distance_mm = 0;
 int32_t targetSpeedX = 0, targetSpeedW = 0;
 int32_t endSpeedX = 0, endSpeedW = 0;
 int32_t accX = 0, decX = 0, accW = 0, decW = 0;
 
-int32_t oldPosErrorX = 0, posErrorX = 0;
-int32_t oldPosErrorW = 0, posErrorW = 0;
+bool onlyUseEncoderFeedback = false;
+bool onlyUseGyroFeedback = false;
 
 
 /**
@@ -68,7 +76,6 @@ void speedProfile(void)
 void getEncoderStatus(void)
 {
 	int32_t leftEncoder, rightEncoder;
-	static int32_t distance = 0;
 
 	leftEncoder = getEncoderEsquerda();
 	rightEncoder = getEncoderDireita();
@@ -140,28 +147,33 @@ void calculateMotorPwm(void) // encoder PD controller
 	int32_t sensorFeedback;
 
 	int32_t encoderFeedbackX, encoderFeedbackW;
+	int32_t posPwmX, posPwmW;
 
     /* simple PD loop to generate base speed for both motors */
 	encoderFeedbackX = rightEncoderChange + leftEncoderChange;
 	encoderFeedbackW = rightEncoderChange - leftEncoderChange;
 
-	//gyroFeedback = aSpeed/gyroFeedbackRatio; //gyroFeedbackRatio mentioned in curve turn lecture
-	//sensorFeedback = sensorError/a_scale;//have sensor error properly scale to fit the system
+	//gyroFeedback = getGyro() / GYRO_SCALE;
+	gyroFeedback = 0;
 
-	//if (onlyUseGyroFeedback)
-		//rotationalFeedback = gyroFeedback;
-	//else if (onlyUseEncoderFeedback)
+	sensorFeedback = -getSensorError();
+	if (sensorFeedback == INFINITO) sensorFeedback = oldSensorError;
+	oldSensorError = sensorFeedback;
+	sensorFeedback /= SENSOR_SCALE;
+
+	/*if(onlyUseGyroFeedback == true)
+		rotationalFeedback = gyroFeedback;
+	else if(onlyUseEncoderFeedback == true)
 		rotationalFeedback = encoderFeedbackW;
-	//else
-		//rotationalFeedback = encoderFeedbackW + gyroFeedback;
-	    //if you use IR sensor as well, the line above will be rotationalFeedback = encoderFeedbackW + gyroFeedback + sensorFeedback;
-	    //make sure to check the sign of sensor error.
+	else
+		rotationalFeedback = encoderFeedbackW + gyroFeedback + sensorFeedback;*/
+	rotationalFeedback = sensorFeedback;
 
-	posErrorX += curSpeedX - encoderFeedbackX;
-	posErrorW += curSpeedW - rotationalFeedback;
+	posErrorX = curSpeedX - encoderFeedbackX;
+	posErrorW = curSpeedW - rotationalFeedback;
 
-	int32_t posPwmX = KP_X * posErrorX + KD_X * (posErrorX - oldPosErrorX);
-	int32_t posPwmW = KP_W * posErrorW + KD_W * (posErrorW - oldPosErrorW);
+	posPwmX = KP_X * posErrorX + KD_X * (posErrorX - oldPosErrorX);
+	posPwmW = KP_W * posErrorW + KD_W * (posErrorW - oldPosErrorW);
 
 	oldPosErrorX = posErrorX;
 	oldPosErrorW = posErrorW;

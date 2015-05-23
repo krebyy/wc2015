@@ -14,14 +14,16 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
+#include <stdbool.h>
 #include "encoders.h"
 #include "motores.h"
+#include "sensores.h"
 
 /* Constantes ----------------------------------------------------------------*/
-#define KP_X 0.05
+#define KP_X 30//0.05
 #define KD_X 0
-#define KP_W 0.05
-#define KD_W 0
+#define KP_W 0.5
+#define KD_W 2
 
 #define TS 1	// Tempo de atualização em [ms]
 
@@ -36,6 +38,10 @@
 
 #define CNT_PER_1000MM 142400	// = (1000*PPR) / (W_DIAMETER*PI)
 #define CNT_PER_360DEG 37120	// = ((2*PI*W_DISTANCE)*CNT_PER_1000MM)/(2*1000)
+
+
+#define GYRO_SCALE 1
+#define SENSOR_SCALE 1
 
 
 /* Macros --------------------------------------------------------------------*/
@@ -61,12 +67,13 @@ int32_t needToDecelerate(int32_t, int32_t, int32_t);
 void resetProfile(void);
 
 
+/* Variáveis externas --------------------------------------------------------*/
 extern TIM_HandleTypeDef htim3;
-extern int32_t distanceLeft, angleLeft;
+extern int32_t distanceLeft, distance_mm;
 extern int32_t targetSpeedX, targetSpeedW;
 extern int32_t endSpeedX, endSpeedW;
 extern int32_t accX, decX, accW, decW;
-extern int32_t distance_mm;
+extern bool onlyUseEncoderFeedback;
 
 
 #endif /* __SPEED_CONTROL_H */

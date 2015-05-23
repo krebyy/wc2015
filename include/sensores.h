@@ -24,11 +24,6 @@
 #define LINHA	GPIO_PIN_SET	// RESET (linha branca); SET (linha preta)
 #define INFINITO	8888		// Valor que indica a não identificação de linha
 
-#define THRESHOLD	1000
-#define PAREDE_ESQUERDA	0b100
-#define PAREDE_FRONTAL	0b010
-#define PAREDE_DIREITA	0b001
-
 #define SENSORES_CLK	__GPIOA_CLK_ENABLE(); __GPIOB_CLK_ENABLE(); __GPIOC_CLK_ENABLE(); __GPIOD_CLK_ENABLE()
 
 #define N_EMISSORES	6
@@ -92,9 +87,7 @@
 
 /* Protótipos das Funções --------------------------------------------------- */
 void sensoresConfig(void);
-int32_t getSensoresParede(int32_t*, int32_t*, int32_t*, int32_t*);
-int32_t getSensoresLinha(void);
-int32_t readLine(void);
+int32_t getSensorError(void);
 int32_t getGyro();
 int32_t getTensao();
 uint32_t getRawADC(uint32_t canal);

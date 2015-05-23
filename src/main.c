@@ -72,9 +72,9 @@ int main (void)
 	delay_ms(1000);
 
 
-	targetSpeedX = SPEEDX_TO_COUNTS(1000);//param_speedX_med);
+	targetSpeedX = SPEEDX_TO_COUNTS(700);//param_speedX_med);
 	accX = decX = ACCX_TO_COUNTS(1000);//param_accX);
-	distanceLeft = MM_TO_COUNTS(720);
+	distanceLeft = MM_TO_COUNTS(12900);
 
 	resetEncoderEsquerda();
 	resetEncoderDireita();

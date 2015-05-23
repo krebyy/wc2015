@@ -116,165 +116,6 @@ void sensoresConfig(void)
 }
 
 
-/**
-  * @brief Realiza a leitura dos sensores de parede
-  * 		(atualiza os sensores frontais e laterais)
-  * @param lf Valor proporcional a distância do sensor frontal esquerdo
-  * @param l Valor proporcional a distância do sensor diagonal esquerdo
-  * @param r Valor proporcional a distância do sensor diagonal direito
-  * @param rf Valor proporcional a distância do sensor frontal direito
-  * @return paredes: máscara de bits indicando presença (1) ou não (0)
-  * 	de paredes. O bit mais significativo representa a parede da esquerda.
-  * 	Ex.: 011 = presença de parede frontal e direita.
-  */
-int32_t getSensoresParede(int32_t* lf, int32_t* l, int32_t* r, int32_t* rf)
-{
-	int32_t paredes = 0;
-
-	(*lf) = getRawADC(LF_R_CH);
-	(*l) = getRawADC(L_R_CH);
-	(*r) = getRawADC(R_R_CH);
-	(*rf) = getRawADC(RF_R_CH);
-
-	// Registra o tempo atual
-	uint32_t t0 = micros();
-
-	// Sensor frontal esquerdo
-	HAL_GPIO_WritePin(LF_E_PORT, LF_E_PIN, HIGH);
-	elapse_us(60, t0);
-	(*lf) = getRawADC(LF_R_CH) - (*lf);
-	HAL_GPIO_WritePin(LF_E_PORT, LF_E_PIN, LOW);
-	if ((*lf) < 0)
-	{
-		(*lf) = 0;
-	}
-	elapse_us(140, t0);
-
-	// Sensor frontal direito
-	HAL_GPIO_WritePin(RF_E_PORT, RF_E_PIN, HIGH);
-	elapse_us(200, t0);
-	(*rf) = getRawADC(RF_R_CH) - (*rf);
-	HAL_GPIO_WritePin(RF_E_PORT, RF_E_PIN, LOW);
-	if ((*rf) < 0)
-	{
-		(*rf) = 0;
-	}
-	elapse_us(280, t0);
-
-	// Sensores laterais
-	HAL_GPIO_WritePin(POWER1_PORT, POWER1_PIN, HIGH);
-	elapse_us(340, t0);
-	(*l) = getRawADC(L_R_CH) - (*l);
-	(*r) = getRawADC(R_R_CH) - (*r);
-	HAL_GPIO_WritePin(POWER1_PORT, POWER1_PIN, LOW);
-	if ((*l) < 0)
-	{
-		(*l) = 0;
-	}
-	if ((*r) < 0)
-	{
-		(*r) = 0;
-	}
-
-
-	// Realiza a máscara de bits
-	if ((*lf) > THRESHOLD || (*rf) > THRESHOLD)
-	{
-		paredes |= PAREDE_FRONTAL;
-	}
-
-	if ((*l) > THRESHOLD)
-	{
-		paredes |= PAREDE_ESQUERDA;
-	}
-
-	if ((*r) > THRESHOLD)
-	{
-		paredes |= PAREDE_DIREITA;
-	}
-
-	return paredes;
-}
-
-
-/**
-  * @brief Verifica os sensores de linha
-  * @param Nenhum
-  * @return erro: valores entre -40 e 40 (valores negativos indicam que
-  *		o robô precisa se deslocar para a esquerda)
-  */
-int32_t getSensoresLinha()
-{
-	int32_t erro = 0, soma = 0, n = 0;
-	uint32_t t0 = micros();
-
-	// Habilita os emissores
-	HAL_GPIO_WritePin(L_LINE_PORT, L_LINE_PIN, HIGH);
-	HAL_GPIO_WritePin(R_LINE_PORT, R_LINE_PIN, HIGH);
-	elapse_us(100, t0);
-
-	// Realiza a leitura de todos os sensores de linha, os sensores das
-	// extremidades pussuem peso maior, no final é realizada a média ponderada
-	if (HAL_GPIO_ReadPin(LINE1_PORT, LINE1_PIN) == LINHA)
-	{
-		soma += -40;
-		n++;
-	}
-	if (HAL_GPIO_ReadPin(LINE2_PORT, LINE2_PIN) == LINHA)
-	{
-		soma += -30;
-		n++;
-	}
-	if (HAL_GPIO_ReadPin(LINE3_PORT, LINE3_PIN) == LINHA)
-	{
-		soma += -20;
-		n++;
-	}
-	if (HAL_GPIO_ReadPin(LINE4_PORT, LINE4_PIN) == LINHA)
-	{
-		soma += -10;
-		n++;
-	}
-	if (HAL_GPIO_ReadPin(LINE5_PORT, LINE5_PIN) == LINHA)
-	{
-		soma += 10;
-		n++;
-	}
-	if (HAL_GPIO_ReadPin(LINE6_PORT, LINE6_PIN) == LINHA)
-	{
-		soma += 20;
-		n++;
-	}
-	if (HAL_GPIO_ReadPin(LINE7_PORT, LINE7_PIN) == LINHA)
-	{
-		soma += 30;
-		n++;
-	}
-	if (HAL_GPIO_ReadPin(LINE8_PORT, LINE8_PIN) == LINHA)
-	{
-		soma += 40;
-		n++;
-	}
-
-	// Desabilita os emissores
-	HAL_GPIO_WritePin(L_LINE_PORT, L_LINE_PIN, LOW);
-	HAL_GPIO_WritePin(R_LINE_PORT, R_LINE_PIN, LOW);
-
-
-	// Retorna a média ou retorna a constante INFINITO indicando
-	// que nenhum sensor leu linha
-	if (n != 0)
-	{
-		erro = soma / n;
-	}
-	else
-	{
-		erro = INFINITO;
-	}
-
-	return erro;
-}
-
 
 /**
   * @brief Realiza várias leituras dos sensores de linha e retorna a média
@@ -282,11 +123,11 @@ int32_t getSensoresLinha()
   * @return erro Valores negativos (delocado para direita), valores positivos
   * (deslocado para esquerda), INFINITO caso não tenha detectado linha
   */
-int32_t readLine(void)
+int32_t getSensorError(void)
 {
 	int32_t erro = 0, soma = 0, n = 0;
 
-	for(int i = 25; i <= 100; i += 5)
+	for(int i = 50; i <= 100; i += 10)
 	{
 		uint32_t t0 = micros();
 
