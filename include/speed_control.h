@@ -18,12 +18,13 @@
 #include "encoders.h"
 #include "motores.h"
 #include "sensores.h"
+#include "leds.h"
 
 /* Constantes ----------------------------------------------------------------*/
-#define KP_X 30//0.05
-#define KD_X 0
+#define KP_X 0.05
+#define KD_X 0.3
 #define KP_W 0.5
-#define KD_W 2
+#define KD_W 4
 
 #define TS 1	// Tempo de atualização em [ms]
 

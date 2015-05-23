@@ -31,6 +31,7 @@
 #define L_IN2_PIN	GPIO_PIN_9
 #define L_IN1_PORT	GPIOB
 #define L_IN1_PIN	GPIO_PIN_8
+
 #define R_PWM_PORT	GPIOB
 #define R_PWM_PIN	GPIO_PIN_7
 #define R_PWM_CHANNEL	TIM_CHANNEL_2

@@ -28,6 +28,8 @@ int32_t oldSensorError = 0;
 
 int32_t curSpeedX = 0, curSpeedW = 0;
 
+//nt32_t buffer
+
 
 /* Variáveis externas --------------------------------------------------------*/
 int32_t distanceLeft = 0, distance_mm = 0;
@@ -169,7 +171,7 @@ void calculateMotorPwm(void) // encoder PD controller
 		rotationalFeedback = encoderFeedbackW + gyroFeedback + sensorFeedback;*/
 	rotationalFeedback = sensorFeedback;
 
-	posErrorX = curSpeedX - encoderFeedbackX;
+	posErrorX += curSpeedX - encoderFeedbackX;
 	posErrorW = curSpeedW - rotationalFeedback;
 
 	posPwmX = KP_X * posErrorX + KD_X * (posErrorX - oldPosErrorX);
@@ -177,6 +179,12 @@ void calculateMotorPwm(void) // encoder PD controller
 
 	oldPosErrorX = posErrorX;
 	oldPosErrorW = posErrorW;
+
+	if ((posPwmX - posPwmW) < 0) setLED(LED1, HIGH);
+	else setLED(LED1, LOW);
+
+	if ((posPwmX + posPwmW) < 0) setLED(LED3, HIGH);
+	else setLED(LED3, LOW);
 
 	setMotores(posPwmX - posPwmW, posPwmX + posPwmW);
 }

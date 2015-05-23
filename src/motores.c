@@ -89,6 +89,16 @@ void motoresConfig(void)
   */
 void setMotores(int16_t pwm_esquerda, int16_t pwm_direita)
 {
+	if (pwm_esquerda < 0)
+	{
+		pwm_esquerda = 0;
+	}
+
+	if (pwm_direita < 0)
+	{
+		pwm_direita = 0;
+	}
+
 	// Acionamento do motor da esquerda
 	if (pwm_esquerda < 0)
 	{

@@ -62,7 +62,7 @@ src/speed_control.o: ../src/speed_control.c ../include/speed_control.h \
  ../system/include/stm32f4-hal/stm32f4xx_hal_pcd_ex.h \
  ../system/include/stm32f4-hal/stm32f4xx_hal_hcd.h ../include/encoders.h \
  ../include/motores.h ../include/sensores.h ../include/delays.h \
- ../include/buzzer.h
+ ../include/buzzer.h ../include/leds.h
 
 ../include/speed_control.h:
 
@@ -201,3 +201,5 @@ src/speed_control.o: ../src/speed_control.c ../include/speed_control.h \
 ../include/delays.h:
 
 ../include/buzzer.h:
+
+../include/leds.h:
