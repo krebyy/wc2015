@@ -16,30 +16,32 @@
   * @{
   */
 GPIO_TypeDef* EMISSORES_PORT[N_EMISSORES] =
-			{LF_E_PORT, POWER1_PORT, POWER2_PORT, RF_E_PORT,
-			L_LINE_PORT, R_LINE_PORT};
+			{L_LINE_PORT, R_LINE_PORT, L_MARK_E_PORT, R_MARK_E_PORT};
 const uint16_t EMISSORES_PIN[N_EMISSORES] =
-			{LF_E_PIN, POWER1_PIN, POWER2_PIN, RF_E_PIN,
-			L_LINE_PIN, R_LINE_PIN};
+			{L_LINE_PIN, R_LINE_PIN, L_MARK_E_PIN, R_MARK_E_PIN};
 
 GPIO_TypeDef* RECEPTORES_PORT[N_RECEPTORES] =
 			{LINE1_PORT, LINE2_PORT, LINE3_PORT, LINE4_PORT,
-			LINE5_PORT, LINE6_PORT, LINE7_PORT, LINE8_PORT};
+			LINE5_PORT, LINE6_PORT, LINE7_PORT, LINE8_PORT,
+			L_MARK_R_PORT, R_MARK_R_PORT};
 const uint16_t RECEPTORES_PIN[N_RECEPTORES] =
 			{LINE1_PIN, LINE2_PIN, LINE3_PIN, LINE4_PIN,
-			LINE5_PIN, LINE6_PIN, LINE7_PIN, LINE8_PIN};
+			LINE5_PIN, LINE6_PIN, LINE7_PIN, LINE8_PIN,
+			L_MARK_R_PIN, R_MARK_R_PIN};
 
 GPIO_TypeDef* ANALOGICAS_PORT[N_ANALOGICAS] =
-			{LF_R_PORT, L_R_PORT, R_R_PORT, RF_R_PORT,
-			G_OUTZ_PORT, G_VREF_PORT, VBAT_PORT};
+			{G_OUTZ_PORT, G_VREF_PORT, VBAT_PORT};
 const uint16_t ANALOGICAS_PIN[N_ANALOGICAS] =
-			{LF_R_PIN, L_R_PIN, R_R_PIN, RF_R_PIN,
-			G_OUTZ_PIN, G_VREF_PIN, VBAT_PIN};
+			{G_OUTZ_PIN, G_VREF_PIN, VBAT_PIN};
 
 ADC_HandleTypeDef hadc1;
 /**
   * @}
   */
+
+
+/* Variáveis externas --------------------------------------------------------*/
+int32_t marks = 0;
 
 
 
@@ -134,6 +136,11 @@ int32_t getSensorError(void)
 		// Habilita os emissores
 		HAL_GPIO_WritePin(L_LINE_PORT, L_LINE_PIN, HIGH);
 		HAL_GPIO_WritePin(R_LINE_PORT, R_LINE_PIN, HIGH);
+		if (i == 100)
+		{
+			HAL_GPIO_WritePin(L_MARK_E_PORT, L_MARK_E_PIN, HIGH);
+			HAL_GPIO_WritePin(R_MARK_E_PORT, R_MARK_E_PIN, HIGH);
+		}
 		elapse_us(i, t0);
 
 		// Realiza a leitura de todos os sensores de linha, os sensores das
@@ -182,6 +189,12 @@ int32_t getSensorError(void)
 		// Desabilita os emissores
 		HAL_GPIO_WritePin(L_LINE_PORT, L_LINE_PIN, LOW);
 		HAL_GPIO_WritePin(R_LINE_PORT, R_LINE_PIN, LOW);
+		if (i == 100)
+		{
+			readMarks();
+			HAL_GPIO_WritePin(L_MARK_E_PORT, L_MARK_E_PORT, LOW);
+			HAL_GPIO_WritePin(R_MARK_E_PORT, R_MARK_E_PIN, LOW);
+		}
 		elapse_us(i * 2, t0);
 	}
 
@@ -198,6 +211,26 @@ int32_t getSensorError(void)
 	return erro;
 }
 
+
+/**
+  * @brief
+  * @param
+  * @return
+  */
+void readMarks(void)
+{
+	if(HAL_GPIO_ReadPin(L_MARK_R_PORT, L_MARK_R_PIN) == LINHA)
+	{
+		beep(50);
+		marks = -1;
+	}
+
+	if(HAL_GPIO_ReadPin(R_MARK_R_PORT, R_MARK_R_PIN) == LINHA)
+	{
+		beep(50);
+		marks = 1;
+	}
+}
 
 /**
   * @brief Verifica a leitura do giroscópio
