@@ -15,14 +15,17 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
+#include <stdbool.h>
 #include "delays.h"
 #include "buzzer.h"
 
 /* Constantes ----------------------------------------------------------------*/
 #define LOW		GPIO_PIN_RESET
 #define HIGH	GPIO_PIN_SET
-#define LINHA	GPIO_PIN_SET	// RESET (linha branca); SET (linha preta)
+#define LINHA	GPIO_PIN_RESET	// RESET (linha branca); SET (linha preta)
 #define INFINITO	8888		// Valor que indica a não identificação de linha
+
+#define MARKER_TH	5
 
 #define SENSORES_CLK	__GPIOA_CLK_ENABLE(); __GPIOB_CLK_ENABLE(); __GPIOC_CLK_ENABLE(); __GPIOD_CLK_ENABLE()
 

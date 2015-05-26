@@ -46,5 +46,7 @@ void systick(void);
 void perifericosConfig(void);
 void init_parametros(void);
 
+extern int32_t param_pid_kp, param_pid_ki, param_pid_kd, param_pid_offset;
+
 
 #endif /* __MAIN_H */

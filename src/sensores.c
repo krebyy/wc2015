@@ -219,17 +219,78 @@ int32_t getSensorError(void)
   */
 void readMarks(void)
 {
-	if(HAL_GPIO_ReadPin(L_MARK_R_PORT, L_MARK_R_PIN) == LINHA)
+	static int32_t marker_corner = 0, marker_start_goal = 0, frun = 0;
+	static bool marker_intersection = false, fmarker = false;
+
+	// Detecção das marcas de partida/chegada
+	if (HAL_GPIO_ReadPin(R_MARK_R_PORT, R_MARK_R_PIN) == GPIO_PIN_SET)
 	{
-		beep(50);
-		marks = -1;
+		marker_start_goal++;
+	}
+	else if (marker_start_goal > 0)
+	{
+		marker_start_goal--;
 	}
 
-	if(HAL_GPIO_ReadPin(R_MARK_R_PORT, R_MARK_R_PIN) == LINHA)
+	// corner and start/goal marker detection
+	if (HAL_GPIO_ReadPin(L_MARK_R_PORT, L_MARK_R_PIN) == GPIO_PIN_SET)
 	{
-		beep(50);
-		marks = 1;
+		marker_corner++;
 	}
+	else if (marker_corner > 0)
+	{
+		marker_corner--;
+	}
+
+	 // detection of intersection, both marker - ignore intersection
+	if (marker_start_goal > 1 && marker_corner > 1)
+	{
+		marker_intersection = true;
+	}
+	if (marker_intersection == true && marker_start_goal == 0 && marker_corner == 0)
+	{
+		marker_intersection = false;
+	}
+
+
+    // corner marker check
+    if (marker_intersection == true)
+    {
+    	fmarker = false;
+    }
+    if (marker_intersection == false && fmarker == false && marker_corner > MARKER_TH)
+    {
+    	fmarker = true;
+    }
+    if (marker_intersection == false && fmarker == true && marker_corner == 0)
+    {
+		fmarker = false;
+		beep(50);
+    }
+
+    // start/goal marker check
+    if (frun == 0 && marker_start_goal > MARKER_TH)
+    {	// start marker detect
+    	frun = 1;
+    }
+    if (frun == 1 && marker_start_goal == 0)
+    {	// start marker fix
+		frun=2;
+		beep(100);
+    }
+    if (frun == 2 && marker_start_goal > MARKER_TH)
+    {	// goal marker detect
+		frun = 3;
+    }
+    if (frun == 3 && marker_intersection == true)
+    {	// ignore intersection
+		frun = 2;
+    }
+    if (frun == 3 && marker_start_goal == 0)
+    {	// goal marker fix
+		frun = 4;
+		beep(100);
+    }
 }
 
 /**

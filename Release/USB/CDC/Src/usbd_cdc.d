@@ -1,5 +1,5 @@
 USB/CDC/Src/usbd_cdc.o: ../USB/CDC/Src/usbd_cdc.c \
- ../USB/CDC/Inc/USBD_CDC.h ../USB/Core/Inc/usbd_ioreq.h \
+ ../USB/CDC/Inc/usbd_cdc.h ../USB/Core/Inc/usbd_ioreq.h \
  ../USB/Core/Inc/usbd_def.h ../include/usbd_conf.h \
  ../system/include/stm32f4-hal/stm32f4xx_hal.h \
  ../include/stm32f4xx_hal_conf.h \
@@ -67,7 +67,7 @@ USB/CDC/Src/usbd_cdc.o: ../USB/CDC/Src/usbd_cdc.c \
  ../USB/Core/Inc/usbd_ctlreq.h ../include/usbd_desc.h \
  ../USB/Core/Inc/usbd_def.h ../USB/Core/Inc/usbd_ctlreq.h
 
-../USB/CDC/Inc/USBD_CDC.h:
+../USB/CDC/Inc/usbd_cdc.h:
 
 ../USB/Core/Inc/usbd_ioreq.h:
 

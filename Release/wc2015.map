@@ -956,6 +956,7 @@ Discarded input sections
  .data          0x00000000        0x0 ./src/sensores.o
  .bss           0x00000000        0x0 ./src/sensores.o
  .text.getGyro  0x00000000       0x14 ./src/sensores.o
+ .bss.marks     0x00000000        0x4 ./src/sensores.o
  .text          0x00000000        0x0 ./src/speed_control.o
  .data          0x00000000        0x0 ./src/speed_control.o
  .bss           0x00000000        0x0 ./src/speed_control.o
@@ -1412,7 +1413,7 @@ END GROUP
                 0x2001fc00                __Main_Stack_Limit = (__stack - __Main_Stack_Size)
                 0x2001fc00                PROVIDE (_Main_Stack_Limit, __Main_Stack_Limit)
                 0x00000100                _Minimum_Stack_Size = 0x100
-                0x20000750                PROVIDE (_Heap_Begin, _end_noinit)
+                0x20000758                PROVIDE (_Heap_Begin, _end_noinit)
                 0x2001fc00                PROVIDE (_Heap_Limit, (__stack - __Main_Stack_Size))
 
 .isr_vector     0x08000000      0x27a
@@ -1518,16 +1519,16 @@ END GROUP
 
 .inits          0x0800027c       0x28
                 0x0800027c                __data_regions_array_start = .
-                0x0800027c        0x4 LONG 0x8005c1c LOADADDR (.data)
+                0x0800027c        0x4 LONG 0x8005cac LOADADDR (.data)
                 0x08000280        0x4 LONG 0x20000000 ADDR (.data)
                 0x08000284        0x4 LONG 0x200000e0 (ADDR (.data) + SIZEOF (.data))
-                0x08000288        0x4 LONG 0x8005c1c LOADADDR (.data_CCMRAM)
+                0x08000288        0x4 LONG 0x8005cac LOADADDR (.data_CCMRAM)
                 0x0800028c        0x4 LONG 0x10000000 ADDR (.data_CCMRAM)
                 0x08000290        0x4 LONG 0x10000000 (ADDR (.data_CCMRAM) + SIZEOF (.data_CCMRAM))
                 0x08000294                __data_regions_array_end = .
                 0x08000294                __bss_regions_array_start = .
                 0x08000294        0x4 LONG 0x200000e0 ADDR (.bss)
-                0x08000298        0x4 LONG 0x20000750 (ADDR (.bss) + SIZEOF (.bss))
+                0x08000298        0x4 LONG 0x20000758 (ADDR (.bss) + SIZEOF (.bss))
                 0x0800029c        0x4 LONG 0x10000000 ADDR (.bss_CCMRAM)
                 0x080002a0        0x4 LONG 0x10000000 (ADDR (.bss_CCMRAM) + SIZEOF (.bss_CCMRAM))
                 0x080002a4                __bss_regions_array_end = .
@@ -1553,7 +1554,7 @@ END GROUP
 .flashtext
  *(.flashtext .flashtext.*)
 
-.text           0x080002a8     0x5974
+.text           0x080002a8     0x5a04
  *(.text .text.*)
  .text.HAL_MspInit
                 0x080002a8        0x2 ./system/src/stm32f4-hal/stm32f4xx_hal.o
@@ -1945,423 +1946,422 @@ END GROUP
                 0x080030fc                menu_rodinhas
  *fill*         0x08003106        0x2 
  .text.readMarks
-                0x08003108       0x44 ./src/sensores.o
+                0x08003108      0x108 ./src/sensores.o
                 0x08003108                readMarks
  .text.getSensorError
-                0x0800314c      0x148 ./src/sensores.o
-                0x0800314c                getSensorError
+                0x08003210      0x138 ./src/sensores.o
+                0x08003210                getSensorError
  .text.getRawADC
-                0x08003294       0x34 ./src/sensores.o
-                0x08003294                getRawADC
+                0x08003348       0x34 ./src/sensores.o
+                0x08003348                getRawADC
  .text.getTensao
-                0x080032c8       0x18 ./src/sensores.o
-                0x080032c8                getTensao
+                0x0800337c       0x18 ./src/sensores.o
+                0x0800337c                getTensao
  .text.sensoresConfig
-                0x080032e0      0x134 ./src/sensores.o
-                0x080032e0                sensoresConfig
+                0x08003394      0x134 ./src/sensores.o
+                0x08003394                sensoresConfig
  .text.speedControlConfig
-                0x08003414       0x54 ./src/speed_control.o
-                0x08003414                speedControlConfig
+                0x080034c8       0x54 ./src/speed_control.o
+                0x080034c8                speedControlConfig
  .text.getEncoderStatus
-                0x08003468       0xa4 ./src/speed_control.o
-                0x08003468                getEncoderStatus
- *fill*         0x0800350c        0x4 
+                0x0800351c       0xa4 ./src/speed_control.o
+                0x0800351c                getEncoderStatus
  .text.calculateMotorPwm
-                0x08003510      0x128 ./src/speed_control.o
-                0x08003510                calculateMotorPwm
+                0x080035c0      0x108 ./src/speed_control.o
+                0x080035c0                calculateMotorPwm
  .text.needToDecelerate
-                0x08003638       0x28 ./src/speed_control.o
-                0x08003638                needToDecelerate
+                0x080036c8       0x28 ./src/speed_control.o
+                0x080036c8                needToDecelerate
  .text.updateCurrentSpeed
-                0x08003660       0xa0 ./src/speed_control.o
-                0x08003660                updateCurrentSpeed
+                0x080036f0       0xa0 ./src/speed_control.o
+                0x080036f0                updateCurrentSpeed
  .text.speedProfile
-                0x08003700       0x12 ./src/speed_control.o
-                0x08003700                speedProfile
- *fill*         0x08003712        0x2 
+                0x08003790       0x12 ./src/speed_control.o
+                0x08003790                speedProfile
+ *fill*         0x080037a2        0x2 
  .text.SysTick_Handler
-                0x08003714       0x34 ./src/stm32f4xx_it.o
-                0x08003714                SysTick_Handler
+                0x080037a4       0x34 ./src/stm32f4xx_it.o
+                0x080037a4                SysTick_Handler
  .text.TIM3_IRQHandler
-                0x08003748        0xc ./src/stm32f4xx_it.o
-                0x08003748                TIM3_IRQHandler
+                0x080037d8        0xc ./src/stm32f4xx_it.o
+                0x080037d8                TIM3_IRQHandler
  .text.USART1_IRQHandler
-                0x08003754        0xc ./src/stm32f4xx_it.o
-                0x08003754                USART1_IRQHandler
+                0x080037e4        0xc ./src/stm32f4xx_it.o
+                0x080037e4                USART1_IRQHandler
  .text.usart1Config
-                0x08003760       0x78 ./src/usart1.o
-                0x08003760                usart1Config
+                0x080037f0       0x78 ./src/usart1.o
+                0x080037f0                usart1Config
  .text.HAL_UART_RxCpltCallback
-                0x080037d8       0x40 ./src/usart1.o
-                0x080037d8                HAL_UART_RxCpltCallback
+                0x08003868       0x40 ./src/usart1.o
+                0x08003868                HAL_UART_RxCpltCallback
  .text.comandosUART
-                0x08003818      0x180 ./src/usart1.o
-                0x08003818                comandosUART
- .text._write   0x08003998       0x18 ./src/usart1.o
-                0x08003998                _write
- .text._read    0x080039b0       0x18 ./src/usart1.o
-                0x080039b0                _read
+                0x080038a8      0x180 ./src/usart1.o
+                0x080038a8                comandosUART
+ .text._write   0x08003a28       0x18 ./src/usart1.o
+                0x08003a28                _write
+ .text._read    0x08003a40       0x18 ./src/usart1.o
+                0x08003a40                _read
  .text.usbConfig
-                0x080039c8        0x2 ./src/usb_user.o
-                0x080039c8                usbConfig
- *fill*         0x080039ca        0x2 
+                0x08003a58        0x2 ./src/usb_user.o
+                0x08003a58                usbConfig
+ *fill*         0x08003a5a        0x2 
  .text.OTG_FS_IRQHandler
-                0x080039cc        0xc ./src/usb_user.o
-                0x080039cc                OTG_FS_IRQHandler
+                0x08003a5c        0xc ./src/usb_user.o
+                0x08003a5c                OTG_FS_IRQHandler
  .text.HAL_PCD_SetupStageCallback
-                0x080039d8        0xe ./src/usbd_conf.o
-                0x080039d8                HAL_PCD_SetupStageCallback
+                0x08003a68        0xe ./src/usbd_conf.o
+                0x08003a68                HAL_PCD_SetupStageCallback
  .text.HAL_PCD_DataOutStageCallback
-                0x080039e6       0x12 ./src/usbd_conf.o
-                0x080039e6                HAL_PCD_DataOutStageCallback
+                0x08003a76       0x12 ./src/usbd_conf.o
+                0x08003a76                HAL_PCD_DataOutStageCallback
  .text.HAL_PCD_DataInStageCallback
-                0x080039f8       0x10 ./src/usbd_conf.o
-                0x080039f8                HAL_PCD_DataInStageCallback
+                0x08003a88       0x10 ./src/usbd_conf.o
+                0x08003a88                HAL_PCD_DataInStageCallback
  .text.HAL_PCD_SOFCallback
-                0x08003a08        0x8 ./src/usbd_conf.o
-                0x08003a08                HAL_PCD_SOFCallback
+                0x08003a98        0x8 ./src/usbd_conf.o
+                0x08003a98                HAL_PCD_SOFCallback
  .text.HAL_PCD_ResetCallback
-                0x08003a10       0x20 ./src/usbd_conf.o
-                0x08003a10                HAL_PCD_ResetCallback
+                0x08003aa0       0x20 ./src/usbd_conf.o
+                0x08003aa0                HAL_PCD_ResetCallback
  .text.HAL_PCD_SuspendCallback
-                0x08003a30        0x8 ./src/usbd_conf.o
-                0x08003a30                HAL_PCD_SuspendCallback
+                0x08003ac0        0x8 ./src/usbd_conf.o
+                0x08003ac0                HAL_PCD_SuspendCallback
  .text.HAL_PCD_ResumeCallback
-                0x08003a38        0x8 ./src/usbd_conf.o
-                0x08003a38                HAL_PCD_ResumeCallback
+                0x08003ac8        0x8 ./src/usbd_conf.o
+                0x08003ac8                HAL_PCD_ResumeCallback
  .text.HAL_PCD_ISOOUTIncompleteCallback
-                0x08003a40        0x8 ./src/usbd_conf.o
-                0x08003a40                HAL_PCD_ISOOUTIncompleteCallback
+                0x08003ad0        0x8 ./src/usbd_conf.o
+                0x08003ad0                HAL_PCD_ISOOUTIncompleteCallback
  .text.HAL_PCD_ISOINIncompleteCallback
-                0x08003a48        0x8 ./src/usbd_conf.o
-                0x08003a48                HAL_PCD_ISOINIncompleteCallback
+                0x08003ad8        0x8 ./src/usbd_conf.o
+                0x08003ad8                HAL_PCD_ISOINIncompleteCallback
  .text.HAL_PCD_ConnectCallback
-                0x08003a50        0x8 ./src/usbd_conf.o
-                0x08003a50                HAL_PCD_ConnectCallback
+                0x08003ae0        0x8 ./src/usbd_conf.o
+                0x08003ae0                HAL_PCD_ConnectCallback
  .text.HAL_PCD_DisconnectCallback
-                0x08003a58        0x8 ./src/usbd_conf.o
-                0x08003a58                HAL_PCD_DisconnectCallback
+                0x08003ae8        0x8 ./src/usbd_conf.o
+                0x08003ae8                HAL_PCD_DisconnectCallback
  .text.USBD_LL_OpenEP
-                0x08003a60       0x14 ./src/usbd_conf.o
-                0x08003a60                USBD_LL_OpenEP
+                0x08003af0       0x14 ./src/usbd_conf.o
+                0x08003af0                USBD_LL_OpenEP
  .text.USBD_LL_StallEP
-                0x08003a74        0xe ./src/usbd_conf.o
-                0x08003a74                USBD_LL_StallEP
+                0x08003b04        0xe ./src/usbd_conf.o
+                0x08003b04                USBD_LL_StallEP
  .text.USBD_LL_ClearStallEP
-                0x08003a82        0xe ./src/usbd_conf.o
-                0x08003a82                USBD_LL_ClearStallEP
+                0x08003b12        0xe ./src/usbd_conf.o
+                0x08003b12                USBD_LL_ClearStallEP
  .text.USBD_LL_IsStallEP
-                0x08003a90       0x26 ./src/usbd_conf.o
-                0x08003a90                USBD_LL_IsStallEP
+                0x08003b20       0x26 ./src/usbd_conf.o
+                0x08003b20                USBD_LL_IsStallEP
  .text.USBD_LL_SetUSBAddress
-                0x08003ab6        0xe ./src/usbd_conf.o
-                0x08003ab6                USBD_LL_SetUSBAddress
+                0x08003b46        0xe ./src/usbd_conf.o
+                0x08003b46                USBD_LL_SetUSBAddress
  .text.USBD_LL_Transmit
-                0x08003ac4        0xe ./src/usbd_conf.o
-                0x08003ac4                USBD_LL_Transmit
+                0x08003b54        0xe ./src/usbd_conf.o
+                0x08003b54                USBD_LL_Transmit
  .text.USBD_LL_PrepareReceive
-                0x08003ad2        0xe ./src/usbd_conf.o
-                0x08003ad2                USBD_LL_PrepareReceive
+                0x08003b62        0xe ./src/usbd_conf.o
+                0x08003b62                USBD_LL_PrepareReceive
  .text.USBD_SetClassConfig
-                0x08003ae0       0x16 ./USB/Core/Src/usbd_core.o
-                0x08003ae0                USBD_SetClassConfig
+                0x08003b70       0x16 ./USB/Core/Src/usbd_core.o
+                0x08003b70                USBD_SetClassConfig
  .text.USBD_ClrClassConfig
-                0x08003af6        0xe ./USB/Core/Src/usbd_core.o
-                0x08003af6                USBD_ClrClassConfig
+                0x08003b86        0xe ./USB/Core/Src/usbd_core.o
+                0x08003b86                USBD_ClrClassConfig
  .text.USBD_LL_SetupStage
-                0x08003b04       0x5a ./USB/Core/Src/usbd_core.o
-                0x08003b04                USBD_LL_SetupStage
+                0x08003b94       0x5a ./USB/Core/Src/usbd_core.o
+                0x08003b94                USBD_LL_SetupStage
  .text.USBD_LL_DataOutStage
-                0x08003b5e       0x60 ./USB/Core/Src/usbd_core.o
-                0x08003b5e                USBD_LL_DataOutStage
+                0x08003bee       0x60 ./USB/Core/Src/usbd_core.o
+                0x08003bee                USBD_LL_DataOutStage
  .text.USBD_LL_DataInStage
-                0x08003bbe       0x88 ./USB/Core/Src/usbd_core.o
-                0x08003bbe                USBD_LL_DataInStage
+                0x08003c4e       0x88 ./USB/Core/Src/usbd_core.o
+                0x08003c4e                USBD_LL_DataInStage
  .text.USBD_LL_Reset
-                0x08003c46       0x3e ./USB/Core/Src/usbd_core.o
-                0x08003c46                USBD_LL_Reset
+                0x08003cd6       0x3e ./USB/Core/Src/usbd_core.o
+                0x08003cd6                USBD_LL_Reset
  .text.USBD_LL_SetSpeed
-                0x08003c84        0x6 ./USB/Core/Src/usbd_core.o
-                0x08003c84                USBD_LL_SetSpeed
+                0x08003d14        0x6 ./USB/Core/Src/usbd_core.o
+                0x08003d14                USBD_LL_SetSpeed
  .text.USBD_LL_Suspend
-                0x08003c8a       0x12 ./USB/Core/Src/usbd_core.o
-                0x08003c8a                USBD_LL_Suspend
+                0x08003d1a       0x12 ./USB/Core/Src/usbd_core.o
+                0x08003d1a                USBD_LL_Suspend
  .text.USBD_LL_Resume
-                0x08003c9c        0xc ./USB/Core/Src/usbd_core.o
-                0x08003c9c                USBD_LL_Resume
+                0x08003d2c        0xc ./USB/Core/Src/usbd_core.o
+                0x08003d2c                USBD_LL_Resume
  .text.USBD_LL_SOF
-                0x08003ca8       0x18 ./USB/Core/Src/usbd_core.o
-                0x08003ca8                USBD_LL_SOF
+                0x08003d38       0x18 ./USB/Core/Src/usbd_core.o
+                0x08003d38                USBD_LL_SOF
  .text.USBD_LL_IsoINIncomplete
-                0x08003cc0        0x4 ./USB/Core/Src/usbd_core.o
-                0x08003cc0                USBD_LL_IsoINIncomplete
+                0x08003d50        0x4 ./USB/Core/Src/usbd_core.o
+                0x08003d50                USBD_LL_IsoINIncomplete
  .text.USBD_LL_IsoOUTIncomplete
-                0x08003cc4        0x4 ./USB/Core/Src/usbd_core.o
-                0x08003cc4                USBD_LL_IsoOUTIncomplete
+                0x08003d54        0x4 ./USB/Core/Src/usbd_core.o
+                0x08003d54                USBD_LL_IsoOUTIncomplete
  .text.USBD_LL_DevConnected
-                0x08003cc8        0x4 ./USB/Core/Src/usbd_core.o
-                0x08003cc8                USBD_LL_DevConnected
+                0x08003d58        0x4 ./USB/Core/Src/usbd_core.o
+                0x08003d58                USBD_LL_DevConnected
  .text.USBD_LL_DevDisconnected
-                0x08003ccc       0x16 ./USB/Core/Src/usbd_core.o
-                0x08003ccc                USBD_LL_DevDisconnected
+                0x08003d5c       0x16 ./USB/Core/Src/usbd_core.o
+                0x08003d5c                USBD_LL_DevDisconnected
  .text.USBD_ParseSetupRequest
-                0x08003ce2       0x28 ./USB/Core/Src/usbd_ctlreq.o
-                0x08003ce2                USBD_ParseSetupRequest
+                0x08003d72       0x28 ./USB/Core/Src/usbd_ctlreq.o
+                0x08003d72                USBD_ParseSetupRequest
  .text.USBD_CtlError
-                0x08003d0a       0x16 ./USB/Core/Src/usbd_ctlreq.o
-                0x08003d0a                USBD_CtlError
+                0x08003d9a       0x16 ./USB/Core/Src/usbd_ctlreq.o
+                0x08003d9a                USBD_CtlError
  .text.USBD_StdDevReq
-                0x08003d20      0x218 ./USB/Core/Src/usbd_ctlreq.o
-                0x08003d20                USBD_StdDevReq
+                0x08003db0      0x218 ./USB/Core/Src/usbd_ctlreq.o
+                0x08003db0                USBD_StdDevReq
  .text.USBD_StdItfReq
-                0x08003f38       0x30 ./USB/Core/Src/usbd_ctlreq.o
-                0x08003f38                USBD_StdItfReq
+                0x08003fc8       0x30 ./USB/Core/Src/usbd_ctlreq.o
+                0x08003fc8                USBD_StdItfReq
  .text.USBD_StdEPReq
-                0x08003f68       0xb2 ./USB/Core/Src/usbd_ctlreq.o
-                0x08003f68                USBD_StdEPReq
+                0x08003ff8       0xb2 ./USB/Core/Src/usbd_ctlreq.o
+                0x08003ff8                USBD_StdEPReq
  .text.USBD_CtlSendData
-                0x0800401a       0x1c ./USB/Core/Src/usbd_ioreq.o
-                0x0800401a                USBD_CtlSendData
+                0x080040aa       0x1c ./USB/Core/Src/usbd_ioreq.o
+                0x080040aa                USBD_CtlSendData
  .text.USBD_CtlContinueSendData
-                0x08004036       0x12 ./USB/Core/Src/usbd_ioreq.o
-                0x08004036                USBD_CtlContinueSendData
+                0x080040c6       0x12 ./USB/Core/Src/usbd_ioreq.o
+                0x080040c6                USBD_CtlContinueSendData
  .text.USBD_CtlContinueRx
-                0x08004048       0x12 ./USB/Core/Src/usbd_ioreq.o
-                0x08004048                USBD_CtlContinueRx
+                0x080040d8       0x12 ./USB/Core/Src/usbd_ioreq.o
+                0x080040d8                USBD_CtlContinueRx
  .text.USBD_CtlSendStatus
-                0x0800405a       0x16 ./USB/Core/Src/usbd_ioreq.o
-                0x0800405a                USBD_CtlSendStatus
+                0x080040ea       0x16 ./USB/Core/Src/usbd_ioreq.o
+                0x080040ea                USBD_CtlSendStatus
  .text.USBD_CtlReceiveStatus
-                0x08004070       0x16 ./USB/Core/Src/usbd_ioreq.o
-                0x08004070                USBD_CtlReceiveStatus
- *fill*         0x08004086        0x2 
- .text          0x08004088      0x370 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/fpu\libgcc.a(_arm_addsubdf3.o)
-                0x08004088                __aeabi_drsub
-                0x08004090                __aeabi_dsub
-                0x08004090                __subdf3
-                0x08004094                __aeabi_dadd
-                0x08004094                __adddf3
-                0x0800430c                __floatunsidf
-                0x0800430c                __aeabi_ui2d
-                0x0800432c                __floatsidf
-                0x0800432c                __aeabi_i2d
-                0x08004350                __aeabi_f2d
-                0x08004350                __extendsfdf2
-                0x0800438c                __floatundidf
-                0x0800438c                __aeabi_ul2d
-                0x0800439c                __floatdidf
-                0x0800439c                __aeabi_l2d
- .text          0x080043f8      0x424 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/fpu\libgcc.a(_arm_muldivdf3.o)
-                0x080043f8                __aeabi_dmul
-                0x080043f8                __muldf3
-                0x0800464c                __divdf3
-                0x0800464c                __aeabi_ddiv
- .text          0x0800481c       0x50 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/fpu\libgcc.a(_arm_fixdfsi.o)
-                0x0800481c                __aeabi_d2iz
-                0x0800481c                __fixdfsi
- .text.atoi     0x0800486c        0x8 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-atoi.o)
-                0x0800486c                atoi
- .text.__errno  0x08004874        0xc e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-errno.o)
-                0x08004874                __errno
- .text.malloc   0x08004880       0x10 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-malloc.o)
-                0x08004880                malloc
- .text.memset   0x08004890       0x10 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-memset.o)
-                0x08004890                memset
- .text._free_r  0x080048a0       0x88 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-freer.o)
-                0x080048a0                _free_r
+                0x08004100       0x16 ./USB/Core/Src/usbd_ioreq.o
+                0x08004100                USBD_CtlReceiveStatus
+ *fill*         0x08004116        0x2 
+ .text          0x08004118      0x370 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/fpu\libgcc.a(_arm_addsubdf3.o)
+                0x08004118                __aeabi_drsub
+                0x08004120                __aeabi_dsub
+                0x08004120                __subdf3
+                0x08004124                __aeabi_dadd
+                0x08004124                __adddf3
+                0x0800439c                __floatunsidf
+                0x0800439c                __aeabi_ui2d
+                0x080043bc                __floatsidf
+                0x080043bc                __aeabi_i2d
+                0x080043e0                __aeabi_f2d
+                0x080043e0                __extendsfdf2
+                0x0800441c                __floatundidf
+                0x0800441c                __aeabi_ul2d
+                0x0800442c                __floatdidf
+                0x0800442c                __aeabi_l2d
+ .text          0x08004488      0x424 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/fpu\libgcc.a(_arm_muldivdf3.o)
+                0x08004488                __aeabi_dmul
+                0x08004488                __muldf3
+                0x080046dc                __divdf3
+                0x080046dc                __aeabi_ddiv
+ .text          0x080048ac       0x50 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/fpu\libgcc.a(_arm_fixdfsi.o)
+                0x080048ac                __aeabi_d2iz
+                0x080048ac                __fixdfsi
+ .text.atoi     0x080048fc        0x8 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-atoi.o)
+                0x080048fc                atoi
+ .text.__errno  0x08004904        0xc e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-errno.o)
+                0x08004904                __errno
+ .text.malloc   0x08004910       0x10 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-malloc.o)
+                0x08004910                malloc
+ .text.memset   0x08004920       0x10 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-memset.o)
+                0x08004920                memset
+ .text._free_r  0x08004930       0x88 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-freer.o)
+                0x08004930                _free_r
  .text._malloc_r
-                0x08004928       0xac e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-mallocr.o)
-                0x08004928                _malloc_r
- .text.printf   0x080049d4       0x30 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-printf.o)
-                0x080049d4                iprintf
-                0x080049d4                printf
- .text._puts_r  0x08004a04       0xbc e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-puts.o)
-                0x08004a04                _puts_r
- .text.puts     0x08004ac0       0x10 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-puts.o)
-                0x08004ac0                puts
- .text._sbrk_r  0x08004ad0       0x20 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-sbrkr.o)
-                0x08004ad0                _sbrk_r
- .text          0x08004af0       0x14 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-strcmp.o)
-                0x08004af0                strcmp
- .text.strtok   0x08004b04       0x64 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-strtok.o)
-                0x08004b04                strtok
+                0x080049b8       0xac e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-mallocr.o)
+                0x080049b8                _malloc_r
+ .text.printf   0x08004a64       0x30 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-printf.o)
+                0x08004a64                iprintf
+                0x08004a64                printf
+ .text._puts_r  0x08004a94       0xbc e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-puts.o)
+                0x08004a94                _puts_r
+ .text.puts     0x08004b50       0x10 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-puts.o)
+                0x08004b50                puts
+ .text._sbrk_r  0x08004b60       0x20 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-sbrkr.o)
+                0x08004b60                _sbrk_r
+ .text          0x08004b80       0x14 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-strcmp.o)
+                0x08004b80                strcmp
+ .text.strtok   0x08004b94       0x64 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-strtok.o)
+                0x08004b94                strtok
  .text.__strtok_r
-                0x08004b68       0x56 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-strtok_r.o)
-                0x08004b68                __strtok_r
- *fill*         0x08004bbe        0x2 
+                0x08004bf8       0x56 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-strtok_r.o)
+                0x08004bf8                __strtok_r
+ *fill*         0x08004c4e        0x2 
  .text._strtol_r
-                0x08004bc0      0x10c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-strtol.o)
-                0x08004bc0                _strtol_r
- .text.strtol   0x08004ccc       0x1c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-strtol.o)
-                0x08004ccc                strtol
+                0x08004c50      0x10c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-strtol.o)
+                0x08004c50                _strtol_r
+ .text.strtol   0x08004d5c       0x1c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-strtol.o)
+                0x08004d5c                strtol
  .text.__swbuf_r
-                0x08004ce8       0xa8 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-wbuf.o)
-                0x08004ce8                __swbuf_r
+                0x08004d78       0xa8 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-wbuf.o)
+                0x08004d78                __swbuf_r
  .text.__swsetup_r
-                0x08004d90       0xd8 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-wsetup.o)
-                0x08004d90                __swsetup_r
+                0x08004e20       0xd8 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-wsetup.o)
+                0x08004e20                __swsetup_r
  .text.__sflush_r
-                0x08004e68      0x108 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-fflush.o)
-                0x08004e68                __sflush_r
+                0x08004ef8      0x108 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-fflush.o)
+                0x08004ef8                __sflush_r
  .text._fflush_r
-                0x08004f70       0x54 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-fflush.o)
-                0x08004f70                _fflush_r
+                0x08005000       0x54 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-fflush.o)
+                0x08005000                _fflush_r
  .text._cleanup_r
-                0x08004fc4        0xc e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-findfp.o)
-                0x08004fc4                _cleanup_r
+                0x08005054        0xc e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-findfp.o)
+                0x08005054                _cleanup_r
  .text.std.isra.0
-                0x08004fd0       0x48 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-findfp.o)
+                0x08005060       0x48 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-findfp.o)
  .text.__sfmoreglue
-                0x08005018       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-findfp.o)
-                0x08005018                __sfmoreglue
- .text.__sinit  0x08005044       0x60 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-findfp.o)
-                0x08005044                __sinit
- .text.__sfp    0x080050a4       0x74 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-findfp.o)
-                0x080050a4                __sfp
+                0x080050a8       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-findfp.o)
+                0x080050a8                __sfmoreglue
+ .text.__sinit  0x080050d4       0x60 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-findfp.o)
+                0x080050d4                __sinit
+ .text.__sfp    0x08005134       0x74 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-findfp.o)
+                0x08005134                __sfp
  .text._fwalk_reent
-                0x08005118       0x3c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-fwalk.o)
-                0x08005118                _fwalk_reent
+                0x080051a8       0x3c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-fwalk.o)
+                0x080051a8                _fwalk_reent
  .text.__smakebuf_r
-                0x08005154       0x9c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-makebuf.o)
-                0x08005154                __smakebuf_r
+                0x080051e4       0x9c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-makebuf.o)
+                0x080051e4                __smakebuf_r
  .text.__sfputc_r
-                0x080051f0       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-vfprintf.o)
+                0x08005280       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-vfprintf.o)
  .text.__sfputs_r
-                0x0800521c       0x24 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-vfprintf.o)
-                0x0800521c                __sfputs_r
+                0x080052ac       0x24 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-vfprintf.o)
+                0x080052ac                __sfputs_r
  .text._vfprintf_r
-                0x08005240      0x210 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-vfprintf.o)
-                0x08005240                _vfprintf_r
-                0x08005240                _vfiprintf_r
+                0x080052d0      0x210 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-vfprintf.o)
+                0x080052d0                _vfprintf_r
+                0x080052d0                _vfiprintf_r
  .text._printf_common
-                0x08005450       0xea e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-vfprintf_i.o)
-                0x08005450                _printf_common
- *fill*         0x0800553a        0x2 
+                0x080054e0       0xea e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-vfprintf_i.o)
+                0x080054e0                _printf_common
+ *fill*         0x080055ca        0x2 
  .text._printf_i
-                0x0800553c      0x234 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-vfprintf_i.o)
-                0x0800553c                _printf_i
- .text.__sread  0x08005770       0x22 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-stdio.o)
-                0x08005770                __sread
+                0x080055cc      0x234 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-vfprintf_i.o)
+                0x080055cc                _printf_i
+ .text.__sread  0x08005800       0x22 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-stdio.o)
+                0x08005800                __sread
  .text.__swrite
-                0x08005792       0x38 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-stdio.o)
-                0x08005792                __swrite
- .text.__sseek  0x080057ca       0x24 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-stdio.o)
-                0x080057ca                __sseek
+                0x08005822       0x38 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-stdio.o)
+                0x08005822                __swrite
+ .text.__sseek  0x0800585a       0x24 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-stdio.o)
+                0x0800585a                __sseek
  .text.__sclose
-                0x080057ee        0x8 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-stdio.o)
-                0x080057ee                __sclose
- *fill*         0x080057f6        0x2 
+                0x0800587e        0x8 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-stdio.o)
+                0x0800587e                __sclose
+ *fill*         0x08005886        0x2 
  .text._write_r
-                0x080057f8       0x24 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-writer.o)
-                0x080057f8                _write_r
+                0x08005888       0x24 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-writer.o)
+                0x08005888                _write_r
  .text._close_r
-                0x0800581c       0x20 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-closer.o)
-                0x0800581c                _close_r
+                0x080058ac       0x20 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-closer.o)
+                0x080058ac                _close_r
  .text._fstat_r
-                0x0800583c       0x24 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-fstatr.o)
-                0x0800583c                _fstat_r
+                0x080058cc       0x24 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-fstatr.o)
+                0x080058cc                _fstat_r
  .text._isatty_r
-                0x08005860       0x20 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-isattyr.o)
-                0x08005860                _isatty_r
+                0x080058f0       0x20 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-isattyr.o)
+                0x080058f0                _isatty_r
  .text._lseek_r
-                0x08005880       0x24 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-lseekr.o)
-                0x08005880                _lseek_r
- .text.memchr   0x080058a4       0x1e e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-memchr.o)
-                0x080058a4                memchr
- *fill*         0x080058c2        0x2 
- .text._read_r  0x080058c4       0x24 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-readr.o)
-                0x080058c4                _read_r
+                0x08005910       0x24 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-lseekr.o)
+                0x08005910                _lseek_r
+ .text.memchr   0x08005934       0x1e e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-memchr.o)
+                0x08005934                memchr
+ *fill*         0x08005952        0x2 
+ .text._read_r  0x08005954       0x24 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-readr.o)
+                0x08005954                _read_r
  *(.rodata .rodata.* .constdata .constdata.*)
  .rodata.APBAHBPrescTable
-                0x080058e8       0x10 ./system/src/stm32f4-hal/stm32f4xx_hal_rcc.o
-                0x080058e8                APBAHBPrescTable
+                0x08005978       0x10 ./system/src/stm32f4-hal/stm32f4xx_hal_rcc.o
+                0x08005978                APBAHBPrescTable
  .rodata.LEDS_PIN
-                0x080058f8        0xa ./src/leds.o
-                0x080058f8                LEDS_PIN
+                0x08005988        0xa ./src/leds.o
+                0x08005988                LEDS_PIN
  .rodata.str1.1
-                0x08005902       0x5b ./src/main.o
+                0x08005992       0x5b ./src/main.o
                                  0x5d (size before relaxing)
- *fill*         0x0800595d        0x1 
+ *fill*         0x080059ed        0x1 
  .rodata.MOTORES_PIN
-                0x0800595e        0xa ./src/motores.o
-                0x0800595e                MOTORES_PIN
+                0x080059ee        0xa ./src/motores.o
+                0x080059ee                MOTORES_PIN
  .rodata.ANALOGICAS_PIN
-                0x08005968        0x6 ./src/sensores.o
-                0x08005968                ANALOGICAS_PIN
+                0x080059f8        0x6 ./src/sensores.o
+                0x080059f8                ANALOGICAS_PIN
  .rodata.str1.1
-                0x0800596e       0x21 ./src/sensores.o
- *fill*         0x0800598f        0x1 
+                0x080059fe       0x21 ./src/sensores.o
+ *fill*         0x08005a1f        0x1 
  .rodata.EMISSORES_PIN
-                0x08005990        0x8 ./src/sensores.o
-                0x08005990                EMISSORES_PIN
+                0x08005a20        0x8 ./src/sensores.o
+                0x08005a20                EMISSORES_PIN
  .rodata.RECEPTORES_PIN
-                0x08005998       0x14 ./src/sensores.o
-                0x08005998                RECEPTORES_PIN
+                0x08005a28       0x14 ./src/sensores.o
+                0x08005a28                RECEPTORES_PIN
  .rodata.str1.1
-                0x080059ac       0xa7 ./src/usart1.o
+                0x08005a3c       0xa7 ./src/usart1.o
  .rodata.str1.1
-                0x08005a53        0x2 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-impure.o)
- *fill*         0x08005a55        0x3 
+                0x08005ae3        0x2 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-impure.o)
+ *fill*         0x08005ae5        0x3 
  .rodata._global_impure_ptr
-                0x08005a58        0x4 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-impure.o)
-                0x08005a58                _global_impure_ptr
+                0x08005ae8        0x4 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-impure.o)
+                0x08005ae8                _global_impure_ptr
  .rodata._ctype_
-                0x08005a5c      0x101 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-ctype_.o)
-                0x08005a5c                _ctype_
- *fill*         0x08005b5d        0x3 
+                0x08005aec      0x101 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-ctype_.o)
+                0x08005aec                _ctype_
+ *fill*         0x08005bed        0x3 
  .rodata.__sf_fake_stdin
-                0x08005b60       0x20 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-findfp.o)
-                0x08005b60                __sf_fake_stdin
+                0x08005bf0       0x20 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-findfp.o)
+                0x08005bf0                __sf_fake_stdin
  .rodata.__sf_fake_stdout
-                0x08005b80       0x20 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-findfp.o)
-                0x08005b80                __sf_fake_stdout
+                0x08005c10       0x20 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-findfp.o)
+                0x08005c10                __sf_fake_stdout
  .rodata.__sf_fake_stderr
-                0x08005ba0       0x20 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-findfp.o)
-                0x08005ba0                __sf_fake_stderr
+                0x08005c30       0x20 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-findfp.o)
+                0x08005c30                __sf_fake_stderr
  .rodata.str1.1
-                0x08005bc0       0x11 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-vfprintf.o)
+                0x08005c50       0x11 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-vfprintf.o)
  .rodata.str1.1
-                0x08005bd1       0x22 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-vfprintf_i.o)
+                0x08005c61       0x22 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-vfprintf_i.o)
  *(vtable)
  *(.eh_frame*)
- *fill*         0x08005bf3        0x1 
- .eh_frame      0x08005bf4       0x28 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-strcmp.o)
+ *fill*         0x08005c83        0x1 
+ .eh_frame      0x08005c84       0x28 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-strcmp.o)
  *(.glue_7)
  .glue_7        0x00000000        0x0 linker stubs
  *(.glue_7t)
  .glue_7t       0x00000000        0x0 linker stubs
 
-.vfp11_veneer   0x08005c1c        0x0
+.vfp11_veneer   0x08005cac        0x0
  .vfp11_veneer  0x00000000        0x0 linker stubs
 
-.v4_bx          0x08005c1c        0x0
+.v4_bx          0x08005cac        0x0
  .v4_bx         0x00000000        0x0 linker stubs
 
-.iplt           0x08005c1c        0x0
+.iplt           0x08005cac        0x0
  .iplt          0x00000000        0x0 ./system/src/stm32f4-hal/stm32f4xx_hal.o
 
-.rel.dyn        0x08005c1c        0x0
+.rel.dyn        0x08005cac        0x0
  .rel.iplt      0x00000000        0x0 ./system/src/stm32f4-hal/stm32f4xx_hal.o
 
 .ARM.extab
  *(.ARM.extab* .gnu.linkonce.armextab.*)
-                0x08005c1c                . = ALIGN (0x4)
-                0x08005c1c                __exidx_start = .
+                0x08005cac                . = ALIGN (0x4)
+                0x08005cac                __exidx_start = .
 
 .ARM.exidx
  *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-                0x08005c1c                __exidx_end = .
-                0x08005c1c                . = ALIGN (0x4)
-                0x08005c1c                _etext = .
-                0x08005c1c                __etext = .
+                0x08005cac                __exidx_end = .
+                0x08005cac                . = ALIGN (0x4)
+                0x08005cac                _etext = .
+                0x08005cac                __etext = .
 
-.data_CCMRAM    0x10000000        0x0 load address 0x08005c1c
+.data_CCMRAM    0x10000000        0x0 load address 0x08005cac
  FILL mask 0xff
  *(.data.CCMRAM .data.CCMRAM.*)
                 0x10000000                . = ALIGN (0x4)
-                0x08005c1c                _sidata = LOADADDR (.data)
+                0x08005cac                _sidata = LOADADDR (.data)
 
-.data           0x20000000       0xe0 load address 0x08005c1c
+.data           0x20000000       0xe0 load address 0x08005cac
  FILL mask 0xff
                 0x20000000                _sdata = .
                 0x20000000                __data_start__ = .
@@ -2400,13 +2400,13 @@ END GROUP
                 0x200000e0                _edata = .
                 0x200000e0                __data_end__ = .
 
-.igot.plt       0x200000e0        0x0 load address 0x08005cfc
+.igot.plt       0x200000e0        0x0 load address 0x08005d8c
  .igot.plt      0x00000000        0x0 ./system/src/stm32f4-hal/stm32f4xx_hal.o
 
 .bss_CCMRAM     0x10000000        0x0
  *(.bss.CCMRAM .bss.CCMRAM.*)
 
-.bss            0x200000e0      0x670
+.bss            0x200000e0      0x678
                 0x200000e0                __bss_start__ = .
                 0x200000e0                _sbss = .
  *(.bss_begin .bss_begin.*)
@@ -2421,152 +2421,160 @@ END GROUP
                 0x200000ec                ticks
  .bss.run       0x200000f0        0x1 ./src/main.o
                 0x200000f0                run
- *fill*         0x200000f1        0x3 
- .bss.marks     0x200000f4        0x4 ./src/sensores.o
-                0x200000f4                marks
+ .bss.fmarker.8969
+                0x200000f1        0x1 ./src/sensores.o
+ .bss.marker_intersection.8968
+                0x200000f2        0x1 ./src/sensores.o
+ *fill*         0x200000f3        0x1 
+ .bss.marker_corner.8965
+                0x200000f4        0x4 ./src/sensores.o
+ .bss.frun.8967
+                0x200000f8        0x4 ./src/sensores.o
+ .bss.marker_start_goal.8966
+                0x200000fc        0x4 ./src/sensores.o
  .bss.rightEncoderChange
-                0x200000f8        0x4 ./src/speed_control.o
-                0x200000f8                rightEncoderChange
+                0x20000100        0x4 ./src/speed_control.o
+                0x20000100                rightEncoderChange
  .bss.encoderChange
-                0x200000fc        0x4 ./src/speed_control.o
-                0x200000fc                encoderChange
- .bss.distance  0x20000100        0x4 ./src/speed_control.o
-                0x20000100                distance
- .bss.decX      0x20000104        0x4 ./src/speed_control.o
-                0x20000104                decX
+                0x20000104        0x4 ./src/speed_control.o
+                0x20000104                encoderChange
+ .bss.distance  0x20000108        0x4 ./src/speed_control.o
+                0x20000108                distance
+ .bss.decX      0x2000010c        0x4 ./src/speed_control.o
+                0x2000010c                decX
  .bss.rightEncoderOld
-                0x20000108        0x4 ./src/speed_control.o
-                0x20000108                rightEncoderOld
- .bss.endSpeedX
-                0x2000010c        0x4 ./src/speed_control.o
-                0x2000010c                endSpeedX
- .bss.distanceLeft
                 0x20000110        0x4 ./src/speed_control.o
-                0x20000110                distanceLeft
- .bss.oldPosErrorX
+                0x20000110                rightEncoderOld
+ .bss.endSpeedX
                 0x20000114        0x4 ./src/speed_control.o
-                0x20000114                oldPosErrorX
- .bss.accW      0x20000118        0x4 ./src/speed_control.o
-                0x20000118                accW
- .bss.accX      0x2000011c        0x4 ./src/speed_control.o
-                0x2000011c                accX
+                0x20000114                endSpeedX
+ .bss.distanceLeft
+                0x20000118        0x4 ./src/speed_control.o
+                0x20000118                distanceLeft
+ .bss.oldPosErrorX
+                0x2000011c        0x4 ./src/speed_control.o
+                0x2000011c                oldPosErrorX
+ .bss.accW      0x20000120        0x4 ./src/speed_control.o
+                0x20000120                accW
+ .bss.accX      0x20000124        0x4 ./src/speed_control.o
+                0x20000124                accX
  .bss.oldPosErrorW
-                0x20000120        0x4 ./src/speed_control.o
-                0x20000120                oldPosErrorW
- .bss.leftEncoderCount
-                0x20000124        0x4 ./src/speed_control.o
-                0x20000124                leftEncoderCount
- .bss.posErrorW
                 0x20000128        0x4 ./src/speed_control.o
-                0x20000128                posErrorW
- .bss.leftEncoderOld
+                0x20000128                oldPosErrorW
+ .bss.leftEncoderCount
                 0x2000012c        0x4 ./src/speed_control.o
-                0x2000012c                leftEncoderOld
- .bss.rightEncoderCount
+                0x2000012c                leftEncoderCount
+ .bss.posErrorW
                 0x20000130        0x4 ./src/speed_control.o
-                0x20000130                rightEncoderCount
- .bss.targetSpeedW
+                0x20000130                posErrorW
+ .bss.leftEncoderOld
                 0x20000134        0x4 ./src/speed_control.o
-                0x20000134                targetSpeedW
- .bss.targetSpeedX
+                0x20000134                leftEncoderOld
+ .bss.rightEncoderCount
                 0x20000138        0x4 ./src/speed_control.o
-                0x20000138                targetSpeedX
- .bss.endSpeedW
+                0x20000138                rightEncoderCount
+ .bss.targetSpeedW
                 0x2000013c        0x4 ./src/speed_control.o
-                0x2000013c                endSpeedW
- .bss.posErrorX
+                0x2000013c                targetSpeedW
+ .bss.targetSpeedX
                 0x20000140        0x4 ./src/speed_control.o
-                0x20000140                posErrorX
- .bss.distance_mm
+                0x20000140                targetSpeedX
+ .bss.endSpeedW
                 0x20000144        0x4 ./src/speed_control.o
-                0x20000144                distance_mm
- .bss.leftEncoderChange
+                0x20000144                endSpeedW
+ .bss.posErrorX
                 0x20000148        0x4 ./src/speed_control.o
-                0x20000148                leftEncoderChange
- .bss.curSpeedW
+                0x20000148                posErrorX
+ .bss.distance_mm
                 0x2000014c        0x4 ./src/speed_control.o
-                0x2000014c                curSpeedW
- .bss.curSpeedX
+                0x2000014c                distance_mm
+ .bss.leftEncoderChange
                 0x20000150        0x4 ./src/speed_control.o
-                0x20000150                curSpeedX
- .bss.oldSensorError
+                0x20000150                leftEncoderChange
+ .bss.curSpeedW
                 0x20000154        0x4 ./src/speed_control.o
-                0x20000154                oldSensorError
- .bss.decW      0x20000158        0x4 ./src/speed_control.o
-                0x20000158                decW
- .bss.encoderCount
+                0x20000154                curSpeedW
+ .bss.curSpeedX
+                0x20000158        0x4 ./src/speed_control.o
+                0x20000158                curSpeedX
+ .bss.oldSensorError
                 0x2000015c        0x4 ./src/speed_control.o
-                0x2000015c                encoderCount
- .bss.i.10916   0x20000160        0x4 ./src/usart1.o
+                0x2000015c                oldSensorError
+ .bss.decW      0x20000160        0x4 ./src/speed_control.o
+                0x20000160                decW
+ .bss.encoderCount
+                0x20000164        0x4 ./src/speed_control.o
+                0x20000164                encoderCount
+ .bss.i.10920   0x20000168        0x4 ./src/usart1.o
  .bss.rx_available
-                0x20000164        0x4 ./src/usart1.o
-                0x20000164                rx_available
- .bss.pos.10910
-                0x20000168        0x4 ./src/usart1.o
+                0x2000016c        0x4 ./src/usart1.o
+                0x2000016c                rx_available
+ .bss.pos.10914
+                0x20000170        0x4 ./src/usart1.o
  .bss.cfgidx.10693
-                0x2000016c        0x1 ./USB/Core/Src/usbd_ctlreq.o
- *fill*         0x2000016d        0x3 
+                0x20000174        0x1 ./USB/Core/Src/usbd_ctlreq.o
+ *fill*         0x20000175        0x3 
  .bss.__malloc_sbrk_start
-                0x20000170        0x4 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-mallocr.o)
-                0x20000170                __malloc_sbrk_start
+                0x20000178        0x4 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-mallocr.o)
+                0x20000178                __malloc_sbrk_start
  .bss.__malloc_free_list
-                0x20000174        0x4 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-mallocr.o)
-                0x20000174                __malloc_free_list
+                0x2000017c        0x4 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-mallocr.o)
+                0x2000017c                __malloc_free_list
  *(COMMON)
- COMMON         0x20000178       0x1c ./system/src/stm32f4-hal/stm32f4xx_hal_flash.o
-                0x20000178                pFlash
- COMMON         0x20000194        0x4 ./system/src/newlib/_syscalls.o
-                0x20000194                errno
- COMMON         0x20000198        0x4 ./src/buzzer.o
-                0x20000198                buzzerTime
- COMMON         0x2000019c       0x78 ./src/encoders.o
-                0x2000019c                htim5
-                0x200001d8                htim2
- COMMON         0x20000214       0x2c ./src/main.o
-                0x20000214                param_pid_kp
-                0x20000218                param_speedX_min
-                0x2000021c                param_pid_ki
-                0x20000220                param_accX
-                0x20000224                param_speedX_max
-                0x20000228                param_pid_kd
-                0x2000022c                param_speedX_med
-                0x20000230                param_pid_offset
-                0x20000234                param_a
-                0x20000238                param_accC
-                0x2000023c                param_b
- COMMON         0x20000240       0x3c ./src/motores.o
-                0x20000240                TimHandle
- COMMON         0x2000027c       0x44 ./src/sensores.o
-                0x2000027c                hadc1
- COMMON         0x200002c0       0x3c ./src/speed_control.o
-                0x200002c0                htim3
- COMMON         0x200002fc       0xa4 ./src/usart1.o
-                0x200002fc                RxByte
-                0x20000300                huart1
-                0x2000033c                RxBuffer
- COMMON         0x200003a0      0x3b0 ./src/usbd_conf.o
-                0x200003a0                hpcd
+ COMMON         0x20000180       0x1c ./system/src/stm32f4-hal/stm32f4xx_hal_flash.o
+                0x20000180                pFlash
+ COMMON         0x2000019c        0x4 ./system/src/newlib/_syscalls.o
+                0x2000019c                errno
+ COMMON         0x200001a0        0x4 ./src/buzzer.o
+                0x200001a0                buzzerTime
+ COMMON         0x200001a4       0x78 ./src/encoders.o
+                0x200001a4                htim5
+                0x200001e0                htim2
+ COMMON         0x2000021c       0x2c ./src/main.o
+                0x2000021c                param_pid_kp
+                0x20000220                param_speedX_min
+                0x20000224                param_pid_ki
+                0x20000228                param_accX
+                0x2000022c                param_speedX_max
+                0x20000230                param_pid_kd
+                0x20000234                param_speedX_med
+                0x20000238                param_pid_offset
+                0x2000023c                param_a
+                0x20000240                param_accC
+                0x20000244                param_b
+ COMMON         0x20000248       0x3c ./src/motores.o
+                0x20000248                TimHandle
+ COMMON         0x20000284       0x44 ./src/sensores.o
+                0x20000284                hadc1
+ COMMON         0x200002c8       0x3c ./src/speed_control.o
+                0x200002c8                htim3
+ COMMON         0x20000304       0xa4 ./src/usart1.o
+                0x20000304                RxByte
+                0x20000308                huart1
+                0x20000344                RxBuffer
+ COMMON         0x200003a8      0x3b0 ./src/usbd_conf.o
+                0x200003a8                hpcd
  *(.bss_end .bss_end.*)
-                0x20000750                . = ALIGN (0x4)
-                0x20000750                __bss_end__ = .
-                0x20000750                _ebss = .
+                0x20000758                . = ALIGN (0x4)
+                0x20000758                __bss_end__ = .
+                0x20000758                _ebss = .
 
 .noinit_CCMRAM
  *(.noinit.CCMRAM .noinit.CCMRAM.*)
 
-.noinit         0x20000750        0x0
-                0x20000750                _noinit = .
+.noinit         0x20000758        0x0
+                0x20000758                _noinit = .
  *(.noinit .noinit.*)
-                0x20000750                . = ALIGN (0x4)
-                0x20000750                _end_noinit = .
-                0x20000750                PROVIDE (end, _end_noinit)
-                0x20000750                PROVIDE (_end, _end_noinit)
-                0x20000750                PROVIDE (__end, _end_noinit)
-                0x20000750                PROVIDE (__end__, _end_noinit)
+                0x20000758                . = ALIGN (0x4)
+                0x20000758                _end_noinit = .
+                0x20000758                PROVIDE (end, _end_noinit)
+                0x20000758                PROVIDE (_end, _end_noinit)
+                0x20000758                PROVIDE (__end, _end_noinit)
+                0x20000758                PROVIDE (__end__, _end_noinit)
 
-._check_stack   0x20000750      0x100
-                0x20000850                . = (. + _Minimum_Stack_Size)
- *fill*         0x20000750      0x100 
+._check_stack   0x20000758      0x100
+                0x20000858                . = (. + _Minimum_Stack_Size)
+ *fill*         0x20000758      0x100 
 
 .b1text
  *(.b1text)
@@ -2904,7 +2912,7 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000    0x1a2a1
+.debug_info     0x00000000    0x1a325
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x88b ./system/src/stm32f4-hal/stm32f4xx_hal.o
  .debug_info    0x0000088b      0xd6e ./system/src/stm32f4-hal/stm32f4xx_hal_adc.o
@@ -2937,17 +2945,17 @@ END GROUP
  .debug_info    0x00010b74      0xd37 ./src/main.o
  .debug_info    0x000118ab      0xbb5 ./src/motores.o
  .debug_info    0x00012460       0xf0 ./src/rodinhas.o
- .debug_info    0x00012550     0x1110 ./src/sensores.o
- .debug_info    0x00013660      0xebc ./src/speed_control.o
- .debug_info    0x0001451c      0x985 ./src/stm32f4xx_it.o
- .debug_info    0x00014ea1     0x1047 ./src/usart1.o
- .debug_info    0x00015ee8      0x895 ./src/usb_user.o
- .debug_info    0x0001677d     0x1aef ./src/usbd_conf.o
- .debug_info    0x0001826c      0xca4 ./USB/Core/Src/usbd_core.o
- .debug_info    0x00018f10      0xbff ./USB/Core/Src/usbd_ctlreq.o
- .debug_info    0x00019b0f      0x792 ./USB/Core/Src/usbd_ioreq.o
+ .debug_info    0x00012550     0x117d ./src/sensores.o
+ .debug_info    0x000136cd      0xed3 ./src/speed_control.o
+ .debug_info    0x000145a0      0x985 ./src/stm32f4xx_it.o
+ .debug_info    0x00014f25     0x1047 ./src/usart1.o
+ .debug_info    0x00015f6c      0x895 ./src/usb_user.o
+ .debug_info    0x00016801     0x1aef ./src/usbd_conf.o
+ .debug_info    0x000182f0      0xca4 ./USB/Core/Src/usbd_core.o
+ .debug_info    0x00018f94      0xbff ./USB/Core/Src/usbd_ctlreq.o
+ .debug_info    0x00019b93      0x792 ./USB/Core/Src/usbd_ioreq.o
 
-.debug_abbrev   0x00000000     0x4b84
+.debug_abbrev   0x00000000     0x4b79
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0x1f4 ./system/src/stm32f4-hal/stm32f4xx_hal.o
  .debug_abbrev  0x000001f4      0x273 ./system/src/stm32f4-hal/stm32f4xx_hal_adc.o
@@ -2980,17 +2988,17 @@ END GROUP
  .debug_abbrev  0x000031cf      0x281 ./src/main.o
  .debug_abbrev  0x00003450      0x1df ./src/motores.o
  .debug_abbrev  0x0000362f       0x9b ./src/rodinhas.o
- .debug_abbrev  0x000036ca      0x2c8 ./src/sensores.o
- .debug_abbrev  0x00003992      0x290 ./src/speed_control.o
- .debug_abbrev  0x00003c22      0x19b ./src/stm32f4xx_it.o
- .debug_abbrev  0x00003dbd      0x26c ./src/usart1.o
- .debug_abbrev  0x00004029      0x1ba ./src/usb_user.o
- .debug_abbrev  0x000041e3      0x2f1 ./src/usbd_conf.o
- .debug_abbrev  0x000044d4      0x26d ./USB/Core/Src/usbd_core.o
- .debug_abbrev  0x00004741      0x2d9 ./USB/Core/Src/usbd_ctlreq.o
- .debug_abbrev  0x00004a1a      0x16a ./USB/Core/Src/usbd_ioreq.o
+ .debug_abbrev  0x000036ca      0x2c2 ./src/sensores.o
+ .debug_abbrev  0x0000398c      0x28b ./src/speed_control.o
+ .debug_abbrev  0x00003c17      0x19b ./src/stm32f4xx_it.o
+ .debug_abbrev  0x00003db2      0x26c ./src/usart1.o
+ .debug_abbrev  0x0000401e      0x1ba ./src/usb_user.o
+ .debug_abbrev  0x000041d8      0x2f1 ./src/usbd_conf.o
+ .debug_abbrev  0x000044c9      0x26d ./USB/Core/Src/usbd_core.o
+ .debug_abbrev  0x00004736      0x2d9 ./USB/Core/Src/usbd_ctlreq.o
+ .debug_abbrev  0x00004a0f      0x16a ./USB/Core/Src/usbd_ioreq.o
 
-.debug_line     0x00000000     0x7e03
+.debug_line     0x00000000     0x7e51
  *(.debug_line)
  .debug_line    0x00000000      0x300 ./system/src/stm32f4-hal/stm32f4xx_hal.o
  .debug_line    0x00000300      0x5c5 ./system/src/stm32f4-hal/stm32f4xx_hal_adc.o
@@ -3023,17 +3031,17 @@ END GROUP
  .debug_line    0x0000607d      0x2df ./src/main.o
  .debug_line    0x0000635c      0x209 ./src/motores.o
  .debug_line    0x00006565      0x105 ./src/rodinhas.o
- .debug_line    0x0000666a      0x365 ./src/sensores.o
- .debug_line    0x000069cf      0x2c2 ./src/speed_control.o
- .debug_line    0x00006c91      0x22b ./src/stm32f4xx_it.o
- .debug_line    0x00006ebc      0x2a7 ./src/usart1.o
- .debug_line    0x00007163      0x18e ./src/usb_user.o
- .debug_line    0x000072f1      0x41e ./src/usbd_conf.o
- .debug_line    0x0000770f      0x318 ./USB/Core/Src/usbd_core.o
- .debug_line    0x00007a27      0x23a ./USB/Core/Src/usbd_ctlreq.o
- .debug_line    0x00007c61      0x1a2 ./USB/Core/Src/usbd_ioreq.o
+ .debug_line    0x0000666a      0x3bf ./src/sensores.o
+ .debug_line    0x00006a29      0x2b6 ./src/speed_control.o
+ .debug_line    0x00006cdf      0x22b ./src/stm32f4xx_it.o
+ .debug_line    0x00006f0a      0x2a7 ./src/usart1.o
+ .debug_line    0x000071b1      0x18e ./src/usb_user.o
+ .debug_line    0x0000733f      0x41e ./src/usbd_conf.o
+ .debug_line    0x0000775d      0x318 ./USB/Core/Src/usbd_core.o
+ .debug_line    0x00007a75      0x23a ./USB/Core/Src/usbd_ctlreq.o
+ .debug_line    0x00007caf      0x1a2 ./USB/Core/Src/usbd_ioreq.o
 
-.debug_frame    0x00000000     0x3694
+.debug_frame    0x00000000     0x36a0
  *(.debug_frame)
  .debug_frame   0x00000000      0x184 ./system/src/stm32f4-hal/stm32f4xx_hal.o
  .debug_frame   0x00000184      0x218 ./system/src/stm32f4-hal/stm32f4xx_hal_adc.o
@@ -3066,45 +3074,45 @@ END GROUP
  .debug_frame   0x00002584       0x88 ./src/main.o
  .debug_frame   0x0000260c       0x50 ./src/motores.o
  .debug_frame   0x0000265c       0x20 ./src/rodinhas.o
- .debug_frame   0x0000267c       0xb8 ./src/sensores.o
- .debug_frame   0x00002734       0xe0 ./src/speed_control.o
- .debug_frame   0x00002814       0x4c ./src/stm32f4xx_it.o
- .debug_frame   0x00002860       0xa0 ./src/usart1.o
- .debug_frame   0x00002900       0x30 ./src/usb_user.o
- .debug_frame   0x00002930      0x25c ./src/usbd_conf.o
- .debug_frame   0x00002b8c      0x1bc ./USB/Core/Src/usbd_core.o
- .debug_frame   0x00002d48       0xb0 ./USB/Core/Src/usbd_ctlreq.o
- .debug_frame   0x00002df8       0xc0 ./USB/Core/Src/usbd_ioreq.o
- .debug_frame   0x00002eb8       0x30 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-atoi.o)
- .debug_frame   0x00002ee8       0x20 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-errno.o)
- .debug_frame   0x00002f08       0x30 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-malloc.o)
- .debug_frame   0x00002f38       0x20 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-memset.o)
- .debug_frame   0x00002f58       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-freer.o)
- .debug_frame   0x00002f84       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-mallocr.o)
- .debug_frame   0x00002fb0       0x74 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-printf.o)
- .debug_frame   0x00003024       0x3c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-puts.o)
- .debug_frame   0x00003060       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-sbrkr.o)
- .debug_frame   0x0000308c       0x38 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-strtok.o)
- .debug_frame   0x000030c4       0x40 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-strtok_r.o)
- .debug_frame   0x00003104       0x54 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-strtol.o)
- .debug_frame   0x00003158       0x3c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-wbuf.o)
- .debug_frame   0x00003194       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-wsetup.o)
- .debug_frame   0x000031c0       0x68 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-fflush.o)
- .debug_frame   0x00003228      0x11c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-findfp.o)
- .debug_frame   0x00003344       0x54 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-fwalk.o)
- .debug_frame   0x00003398       0x34 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-makebuf.o)
- .debug_frame   0x000033cc       0xb8 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-vfprintf.o)
- .debug_frame   0x00003484       0x58 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-vfprintf_i.o)
- .debug_frame   0x000034dc       0x88 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-stdio.o)
- .debug_frame   0x00003564       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-writer.o)
- .debug_frame   0x00003590       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-closer.o)
- .debug_frame   0x000035bc       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-fstatr.o)
- .debug_frame   0x000035e8       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-isattyr.o)
- .debug_frame   0x00003614       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-lseekr.o)
- .debug_frame   0x00003640       0x28 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-memchr.o)
- .debug_frame   0x00003668       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-readr.o)
+ .debug_frame   0x0000267c       0xc8 ./src/sensores.o
+ .debug_frame   0x00002744       0xdc ./src/speed_control.o
+ .debug_frame   0x00002820       0x4c ./src/stm32f4xx_it.o
+ .debug_frame   0x0000286c       0xa0 ./src/usart1.o
+ .debug_frame   0x0000290c       0x30 ./src/usb_user.o
+ .debug_frame   0x0000293c      0x25c ./src/usbd_conf.o
+ .debug_frame   0x00002b98      0x1bc ./USB/Core/Src/usbd_core.o
+ .debug_frame   0x00002d54       0xb0 ./USB/Core/Src/usbd_ctlreq.o
+ .debug_frame   0x00002e04       0xc0 ./USB/Core/Src/usbd_ioreq.o
+ .debug_frame   0x00002ec4       0x30 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-atoi.o)
+ .debug_frame   0x00002ef4       0x20 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-errno.o)
+ .debug_frame   0x00002f14       0x30 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-malloc.o)
+ .debug_frame   0x00002f44       0x20 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-memset.o)
+ .debug_frame   0x00002f64       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-freer.o)
+ .debug_frame   0x00002f90       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-mallocr.o)
+ .debug_frame   0x00002fbc       0x74 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-printf.o)
+ .debug_frame   0x00003030       0x3c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-puts.o)
+ .debug_frame   0x0000306c       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-sbrkr.o)
+ .debug_frame   0x00003098       0x38 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-strtok.o)
+ .debug_frame   0x000030d0       0x40 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-strtok_r.o)
+ .debug_frame   0x00003110       0x54 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-strtol.o)
+ .debug_frame   0x00003164       0x3c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-wbuf.o)
+ .debug_frame   0x000031a0       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-wsetup.o)
+ .debug_frame   0x000031cc       0x68 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-fflush.o)
+ .debug_frame   0x00003234      0x11c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-findfp.o)
+ .debug_frame   0x00003350       0x54 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-fwalk.o)
+ .debug_frame   0x000033a4       0x34 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-makebuf.o)
+ .debug_frame   0x000033d8       0xb8 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-vfprintf.o)
+ .debug_frame   0x00003490       0x58 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-nano-vfprintf_i.o)
+ .debug_frame   0x000034e8       0x88 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-stdio.o)
+ .debug_frame   0x00003570       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-writer.o)
+ .debug_frame   0x0000359c       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-closer.o)
+ .debug_frame   0x000035c8       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-fstatr.o)
+ .debug_frame   0x000035f4       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-isattyr.o)
+ .debug_frame   0x00003620       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-lseekr.o)
+ .debug_frame   0x0000364c       0x28 e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-memchr.o)
+ .debug_frame   0x00003674       0x2c e:/arm_toolchains/gccarm/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m/fpu\libg_nano.a(lib_a-readr.o)
 
-.debug_str      0x00000000     0x5ab3
+.debug_str      0x00000000     0x5af4
  *(.debug_str)
  .debug_str     0x00000000      0xa23 ./system/src/stm32f4-hal/stm32f4xx_hal.o
                                 0xa80 (size before relaxing)
@@ -3168,26 +3176,26 @@ END GROUP
                                 0x94f (size before relaxing)
  .debug_str     0x00004f38       0x12 ./src/rodinhas.o
                                 0x1f4 (size before relaxing)
- .debug_str     0x00004f4a       0xc0 ./src/sensores.o
-                                0xabc (size before relaxing)
- .debug_str     0x0000500a      0x230 ./src/speed_control.o
-                                0xfc1 (size before relaxing)
- .debug_str     0x0000523a       0x38 ./src/stm32f4xx_it.o
+ .debug_str     0x00004f4a      0x101 ./src/sensores.o
+                                0xb03 (size before relaxing)
+ .debug_str     0x0000504b      0x230 ./src/speed_control.o
+                                0xfec (size before relaxing)
+ .debug_str     0x0000527b       0x38 ./src/stm32f4xx_it.o
                                 0x991 (size before relaxing)
- .debug_str     0x00005272       0x51 ./src/usart1.o
+ .debug_str     0x000052b3       0x51 ./src/usart1.o
                                 0xe94 (size before relaxing)
- .debug_str     0x000052c3      0x345 ./src/usb_user.o
+ .debug_str     0x00005304      0x345 ./src/usb_user.o
                                 0x8a0 (size before relaxing)
- .debug_str     0x00005608      0x257 ./src/usbd_conf.o
+ .debug_str     0x00005649      0x257 ./src/usbd_conf.o
                                0x1467 (size before relaxing)
- .debug_str     0x0000585f      0x145 ./USB/Core/Src/usbd_core.o
+ .debug_str     0x000058a0      0x145 ./USB/Core/Src/usbd_core.o
                                 0x84c (size before relaxing)
- .debug_str     0x000059a4       0xd0 ./USB/Core/Src/usbd_ctlreq.o
+ .debug_str     0x000059e5       0xd0 ./USB/Core/Src/usbd_ctlreq.o
                                 0x77d (size before relaxing)
- .debug_str     0x00005a74       0x3f ./USB/Core/Src/usbd_ioreq.o
+ .debug_str     0x00005ab5       0x3f ./USB/Core/Src/usbd_ioreq.o
                                 0x6aa (size before relaxing)
 
-.debug_loc      0x00000000     0xab78
+.debug_loc      0x00000000     0xab6d
  *(.debug_loc)
  .debug_loc     0x00000000       0x5c ./system/src/stm32f4-hal/stm32f4xx_hal.o
  .debug_loc     0x0000005c      0x689 ./system/src/stm32f4-hal/stm32f4xx_hal_adc.o
@@ -3213,12 +3221,12 @@ END GROUP
  .debug_loc     0x0000900c       0x7f ./src/main.o
  .debug_loc     0x0000908b       0xa0 ./src/motores.o
  .debug_loc     0x0000912b      0x1c0 ./src/sensores.o
- .debug_loc     0x000092eb      0x190 ./src/speed_control.o
- .debug_loc     0x0000947b      0x16f ./src/usart1.o
- .debug_loc     0x000095ea      0x67a ./src/usbd_conf.o
- .debug_loc     0x00009c64      0x645 ./USB/Core/Src/usbd_core.o
- .debug_loc     0x0000a2a9      0x6cb ./USB/Core/Src/usbd_ctlreq.o
- .debug_loc     0x0000a974      0x204 ./USB/Core/Src/usbd_ioreq.o
+ .debug_loc     0x000092eb      0x185 ./src/speed_control.o
+ .debug_loc     0x00009470      0x16f ./src/usart1.o
+ .debug_loc     0x000095df      0x67a ./src/usbd_conf.o
+ .debug_loc     0x00009c59      0x645 ./USB/Core/Src/usbd_core.o
+ .debug_loc     0x0000a29e      0x6cb ./USB/Core/Src/usbd_ctlreq.o
+ .debug_loc     0x0000a969      0x204 ./USB/Core/Src/usbd_ioreq.o
 
 .debug_macinfo
  *(.debug_macinfo)

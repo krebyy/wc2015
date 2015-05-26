@@ -158,7 +158,7 @@ void calculateMotorPwm(void) // encoder PD controller
 	//gyroFeedback = getGyro() / GYRO_SCALE;
 	gyroFeedback = 0;
 
-	sensorFeedback = -getSensorError();
+	sensorFeedback = getSensorError();
 	if (sensorFeedback == INFINITO) sensorFeedback = oldSensorError;
 	oldSensorError = sensorFeedback;
 	sensorFeedback /= SENSOR_SCALE;
@@ -175,7 +175,7 @@ void calculateMotorPwm(void) // encoder PD controller
 	posErrorW = curSpeedW - rotationalFeedback;
 
 	posPwmX = KP_X * posErrorX + KD_X * (posErrorX - oldPosErrorX);
-	posPwmW = KP_W * posErrorW + KD_W * (posErrorW - oldPosErrorW);
+	posPwmW = (posErrorW / param_pid_kp) + param_pid_kd * (posErrorW - oldPosErrorW);
 
 	oldPosErrorX = posErrorX;
 	oldPosErrorW = posErrorW;

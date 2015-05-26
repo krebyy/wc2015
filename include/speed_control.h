@@ -14,17 +14,13 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
-#include <stdbool.h>
-#include "encoders.h"
-#include "motores.h"
-#include "sensores.h"
-#include "leds.h"
+#include "main.h"
 
 /* Constantes ----------------------------------------------------------------*/
 #define KP_X 0.05
 #define KD_X 0.3
-#define KP_W 0.5
-#define KD_W 4
+#define KP_W 0.2
+#define KD_W 0
 
 #define TS 1	// Tempo de atualização em [ms]
 
