@@ -27,12 +27,16 @@
 #define USARTx_IRQn			USART1_IRQn
 #define USARTx_IRQHandler	USART1_IRQHandler
 
+#define USARTx_TX_DMA_CHANNEL            DMA_CHANNEL_4
+#define USARTx_TX_DMA_STREAM             DMA2_Stream7
+
 /* Protótipos das Funções --------------------------------------------------- */
 void usart1Config(void);
 int32_t comandosUART(void);
 
 /* Variáveis ---------------------------------------------------------------- */
 extern UART_HandleTypeDef huart1;
+extern DMA_HandleTypeDef hdma_tx;
 extern char RxBuffer[BUFFER_SIZE];
 extern char RxByte;
 extern uint32_t rx_available;

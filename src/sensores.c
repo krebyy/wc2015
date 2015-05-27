@@ -276,7 +276,7 @@ void readMarks(void)
     if (frun == 1 && marker_start_goal == 0)
     {	// start marker fix
 		frun=2;
-		beep(100);
+		beep(200);
     }
     if (frun == 2 && marker_start_goal > MARKER_TH)
     {	// goal marker detect
@@ -289,7 +289,8 @@ void readMarks(void)
     if (frun == 3 && marker_start_goal == 0)
     {	// goal marker fix
 		frun = 4;
-		beep(100);
+		beep(200);
+		distanceLeft = MM_TO_COUNTS(150);
     }
 }
 

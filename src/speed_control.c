@@ -28,7 +28,8 @@ int32_t oldSensorError = 0;
 
 int32_t curSpeedX = 0, curSpeedW = 0;
 
-//nt32_t buffer
+int32_t bufferSpeeds[200];
+uint8_t index_buffer = 0;
 
 
 /* Variáveis externas --------------------------------------------------------*/
@@ -96,6 +97,17 @@ void getEncoderStatus(void)
 	distanceLeft -= encoderChange;// update distanceLeft
 	distance += encoderChange;
 	distance_mm = COUNTS_TO_MM(distance);
+
+	// Envia as velocidades dos motores (pacotes de 100 velocidades - a cada 100ms)
+	bufferSpeeds[index_buffer] = leftEncoderCount;
+	bufferSpeeds[index_buffer + 1] = rightEncoderCount;
+	index_buffer += 2;
+	if (index_buffer == 200)
+	{
+		HAL_UART_Transmit_DMA(&huart1, (uint8_t*)bufferSpeeds, 800);
+		index_buffer = 0;
+	}
+
 }
 
 
@@ -180,10 +192,10 @@ void calculateMotorPwm(void) // encoder PD controller
 	oldPosErrorX = posErrorX;
 	oldPosErrorW = posErrorW;
 
-	if ((posPwmX - posPwmW) < 0) setLED(LED1, HIGH);
+	if (sensorFeedback < 0) setLED(LED1, HIGH);
 	else setLED(LED1, LOW);
 
-	if ((posPwmX + posPwmW) < 0) setLED(LED3, HIGH);
+	if (sensorFeedback > 0) setLED(LED3, HIGH);
 	else setLED(LED3, LOW);
 
 	setMotores(posPwmX - posPwmW, posPwmX + posPwmW);

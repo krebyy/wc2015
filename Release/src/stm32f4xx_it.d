@@ -64,7 +64,7 @@ src/stm32f4xx_it.o: ../src/stm32f4xx_it.c \
  ../include/stm32f4xx_it.h ../include/main.h ../include/stm32f4xx_it.h \
  ../include/delays.h ../include/buzzer.h ../include/leds.h \
  ../include/botao.h ../include/motores.h ../include/sensores.h \
- ../include/encoders.h ../include/usart1.h ../include/main.h \
+ ../include/main.h ../include/encoders.h ../include/usart1.h \
  ../include/usb_user.h ../USB/Core/Inc/usbd_core.h ../include/usbd_conf.h \
  ../USB/Core/Inc/usbd_def.h ../USB/Core/Inc/usbd_ioreq.h \
  ../USB/Core/Inc/usbd_core.h ../USB/Core/Inc/usbd_ctlreq.h \
@@ -217,11 +217,11 @@ src/stm32f4xx_it.o: ../src/stm32f4xx_it.c \
 
 ../include/sensores.h:
 
+../include/main.h:
+
 ../include/encoders.h:
 
 ../include/usart1.h:
-
-../include/main.h:
 
 ../include/usb_user.h:
 

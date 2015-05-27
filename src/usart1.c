@@ -13,6 +13,7 @@
 
 /* Variáveis Externas ------------------------------------------------------- */
 UART_HandleTypeDef huart1;
+DMA_HandleTypeDef hdma_tx;
 char RxBuffer[BUFFER_SIZE];
 char RxByte;
 uint32_t rx_available = 0;
@@ -27,6 +28,7 @@ void usart1Config(void)
 {
 	__GPIOA_CLK_ENABLE();	// Habilita o barramento de clock do GPIOA
 	__USART1_CLK_ENABLE();	// Habilita o barramento de clock da USART1
+	__DMA2_CLK_ENABLE();
 
 	// Configura os GPIOs da USART1 como Alternate Function
 	GPIO_InitTypeDef GPIO_InitStruct;
@@ -50,6 +52,28 @@ void usart1Config(void)
 
 	HAL_NVIC_SetPriority(USARTx_IRQn, 1, 0);
 	HAL_NVIC_EnableIRQ(USARTx_IRQn);
+
+
+	/*##-3- Configure the DMA streams ##########################################*/
+	/* Configure the DMA handler for Transmission process */
+	hdma_tx.Instance                 = USARTx_TX_DMA_STREAM;
+	hdma_tx.Init.Channel             = USARTx_TX_DMA_CHANNEL;
+	hdma_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
+	hdma_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
+	hdma_tx.Init.MemInc              = DMA_MINC_ENABLE;
+	hdma_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+	hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+	hdma_tx.Init.Mode                = DMA_CIRCULAR;
+	hdma_tx.Init.Priority            = DMA_PRIORITY_LOW;
+	hdma_tx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+	hdma_tx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+	hdma_tx.Init.MemBurst            = DMA_MBURST_SINGLE;// _INC4;
+	hdma_tx.Init.PeriphBurst         = DMA_PBURST_SINGLE;// _INC4;
+
+	HAL_DMA_Init(&hdma_tx);
+
+	/* Associate the initialized DMA handle to the the UART handle */
+	__HAL_LINKDMA(&huart1, hdmatx, hdma_tx);
 }
 
 

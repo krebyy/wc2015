@@ -15,9 +15,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
-#include <stdbool.h>
-#include "delays.h"
-#include "buzzer.h"
+#include "main.h"
 
 /* Constantes ----------------------------------------------------------------*/
 #define LOW		GPIO_PIN_RESET

@@ -60,8 +60,17 @@ src/sensores.o: ../src/sensores.c ../include/sensores.h \
  ../system/include/stm32f4-hal/stm32f4xx_hal_pcd.h \
  ../system/include/stm32f4-hal/stm32f4xx_ll_usb.h \
  ../system/include/stm32f4-hal/stm32f4xx_hal_pcd_ex.h \
- ../system/include/stm32f4-hal/stm32f4xx_hal_hcd.h ../include/delays.h \
- ../include/buzzer.h
+ ../system/include/stm32f4-hal/stm32f4xx_hal_hcd.h ../include/main.h \
+ ../include/stm32f4xx_it.h ../include/delays.h ../include/buzzer.h \
+ ../include/leds.h ../include/botao.h ../include/motores.h \
+ ../include/sensores.h ../include/encoders.h ../include/usart1.h \
+ ../include/usb_user.h ../USB/Core/Inc/usbd_core.h ../include/usbd_conf.h \
+ ../USB/Core/Inc/usbd_def.h ../USB/Core/Inc/usbd_ioreq.h \
+ ../USB/Core/Inc/usbd_core.h ../USB/Core/Inc/usbd_ctlreq.h \
+ ../USB/CDC/Inc/usbd_cdc.h ../USB/Core/Inc/usbd_ioreq.h \
+ ../USB/CDC/Inc/usbd_cdc_if_template.h ../USB/CDC/Inc/usbd_cdc.h \
+ ../include/usbd_desc.h ../USB/Core/Inc/usbd_def.h ../include/flash.h \
+ ../include/speed_control.h ../include/rodinhas.h
 
 ../include/sensores.h:
 
@@ -191,6 +200,54 @@ src/sensores.o: ../src/sensores.c ../include/sensores.h \
 
 ../system/include/stm32f4-hal/stm32f4xx_hal_hcd.h:
 
+../include/main.h:
+
+../include/stm32f4xx_it.h:
+
 ../include/delays.h:
 
 ../include/buzzer.h:
+
+../include/leds.h:
+
+../include/botao.h:
+
+../include/motores.h:
+
+../include/sensores.h:
+
+../include/encoders.h:
+
+../include/usart1.h:
+
+../include/usb_user.h:
+
+../USB/Core/Inc/usbd_core.h:
+
+../include/usbd_conf.h:
+
+../USB/Core/Inc/usbd_def.h:
+
+../USB/Core/Inc/usbd_ioreq.h:
+
+../USB/Core/Inc/usbd_core.h:
+
+../USB/Core/Inc/usbd_ctlreq.h:
+
+../USB/CDC/Inc/usbd_cdc.h:
+
+../USB/Core/Inc/usbd_ioreq.h:
+
+../USB/CDC/Inc/usbd_cdc_if_template.h:
+
+../USB/CDC/Inc/usbd_cdc.h:
+
+../include/usbd_desc.h:
+
+../USB/Core/Inc/usbd_def.h:
+
+../include/flash.h:
+
+../include/speed_control.h:
+
+../include/rodinhas.h:
