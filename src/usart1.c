@@ -63,17 +63,27 @@ void usart1Config(void)
 	hdma_tx.Init.MemInc              = DMA_MINC_ENABLE;
 	hdma_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
 	hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-	hdma_tx.Init.Mode                = DMA_CIRCULAR;
+	hdma_tx.Init.Mode                = DMA_NORMAL;
 	hdma_tx.Init.Priority            = DMA_PRIORITY_LOW;
 	hdma_tx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
 	hdma_tx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-	hdma_tx.Init.MemBurst            = DMA_MBURST_SINGLE;// _INC4;
-	hdma_tx.Init.PeriphBurst         = DMA_PBURST_SINGLE;// _INC4;
+	hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
+	hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
 	HAL_DMA_Init(&hdma_tx);
 
 	/* Associate the initialized DMA handle to the the UART handle */
 	__HAL_LINKDMA(&huart1, hdmatx, hdma_tx);
+
+	/*##-4- Configure the NVIC for DMA #########################################*/
+	/* NVIC configuration for DMA transfer complete interrupt (USARTx_TX) */
+	HAL_NVIC_SetPriority(DMA2_Stream7_IRQn, 1, 1);
+	HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
+}
+
+void DMA2_Stream7_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(huart1.hdmatx);
 }
 
 
@@ -205,6 +215,7 @@ int32_t comandosUART(void)
 int _write(int file, char *ptr, int len)
 {
 	HAL_UART_Transmit(&huart1, ptr, len, USART_TIMEOUT);
+	//HAL_UART_Transmit_DMA(&huart1, ptr, len);
 
 	return len;
 }

@@ -85,7 +85,7 @@ uint32_t getRawADC(uint32_t canal);
 
 
 /* Variáveis externas --------------------------------------------------------*/
-extern int32_t marks;
+extern bool valid_marker;
 
 
 #endif /* __SENSORES_H */

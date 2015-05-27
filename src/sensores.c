@@ -41,7 +41,7 @@ ADC_HandleTypeDef hadc1;
 
 
 /* Variáveis externas --------------------------------------------------------*/
-int32_t marks = 0;
+bool valid_marker = false;
 
 
 
@@ -259,13 +259,15 @@ void readMarks(void)
     	fmarker = false;
     }
     if (marker_intersection == false && fmarker == false && marker_corner > MARKER_TH)
-    {
+    {	// corner marker detect
     	fmarker = true;
     }
     if (marker_intersection == false && fmarker == true && marker_corner == 0)
-    {
+    {	// corner marker fix
 		fmarker = false;
 		beep(50);
+
+		valid_marker = true;
     }
 
     // start/goal marker check
@@ -277,6 +279,8 @@ void readMarks(void)
     {	// start marker fix
 		frun=2;
 		beep(200);
+
+		valid_marker = true;
     }
     if (frun == 2 && marker_start_goal > MARKER_TH)
     {	// goal marker detect
@@ -291,6 +295,8 @@ void readMarks(void)
 		frun = 4;
 		beep(200);
 		distanceLeft = MM_TO_COUNTS(150);
+
+		valid_marker = true;
     }
 }
 

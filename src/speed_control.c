@@ -28,8 +28,13 @@ int32_t oldSensorError = 0;
 
 int32_t curSpeedX = 0, curSpeedW = 0;
 
-int32_t bufferSpeeds[200];
-uint8_t index_buffer = 0;
+int32_t bufferCounts[200];
+uint8_t index_buffer_counts = 0;
+
+int32_t bufferDistances[20] = {0};
+int32_t bufferSpeedsWm[20] = {0};
+uint8_t index_buffer_sector = 0;
+int32_t accumulatorSpeedW = 0, numSpeedW = 0;
 
 
 /* Variáveis externas --------------------------------------------------------*/
@@ -40,6 +45,9 @@ int32_t accX = 0, decX = 0, accW = 0, decW = 0;
 
 bool onlyUseEncoderFeedback = false;
 bool onlyUseGyroFeedback = false;
+bool onlyUseSensorFeedback = false;
+
+//#define CNTS_PRINTS
 
 
 /**
@@ -73,6 +81,34 @@ void speedProfile(void)
 	getEncoderStatus();
 	updateCurrentSpeed();
 	calculateMotorPwm();
+
+	// Registra a distância do trecho e o SpeedW_médio
+	if (valid_marker == true)
+	{
+		bufferDistances[index_buffer_sector] = distance - bufferDistances[index_buffer_sector - 1];
+		bufferSpeedsWm[index_buffer_sector] = accumulatorSpeedW / numSpeedW;
+
+		printf("D[%d] = %d\r\n", index_buffer_sector, bufferDistances[index_buffer_sector]);
+		printf("W[%d] = %d\r\n", index_buffer_sector, bufferSpeedsWm[index_buffer_sector]);
+
+		index_buffer_sector++;
+		accumulatorSpeedW = 0;
+		numSpeedW = 0;
+		valid_marker = false;
+	}
+
+#ifdef CNTS_PRINTS
+	// Envia a contagem dos encoders (pacotes de 100 contagens - a cada 100ms)
+	bufferCounts[index_buffer_counts] = leftEncoderCount;
+	bufferCounts[index_buffer_counts + 1] = rightEncoderCount;
+	index_buffer_counts += 2;
+	if (index_buffer_counts == 200)
+	{
+		HAL_UART_DMAResume(&huart1);
+		HAL_UART_Transmit_DMA(&huart1, (uint8_t*)bufferCounts, 800);
+		index_buffer_counts = 0;
+	}
+#endif
 }
 
 
@@ -97,17 +133,6 @@ void getEncoderStatus(void)
 	distanceLeft -= encoderChange;// update distanceLeft
 	distance += encoderChange;
 	distance_mm = COUNTS_TO_MM(distance);
-
-	// Envia as velocidades dos motores (pacotes de 100 velocidades - a cada 100ms)
-	bufferSpeeds[index_buffer] = leftEncoderCount;
-	bufferSpeeds[index_buffer + 1] = rightEncoderCount;
-	index_buffer += 2;
-	if (index_buffer == 200)
-	{
-		HAL_UART_Transmit_DMA(&huart1, (uint8_t*)bufferSpeeds, 800);
-		index_buffer = 0;
-	}
-
 }
 
 
@@ -166,6 +191,9 @@ void calculateMotorPwm(void) // encoder PD controller
     /* simple PD loop to generate base speed for both motors */
 	encoderFeedbackX = rightEncoderChange + leftEncoderChange;
 	encoderFeedbackW = rightEncoderChange - leftEncoderChange;
+
+	accumulatorSpeedW += encoderFeedbackW;
+	numSpeedW++;
 
 	//gyroFeedback = getGyro() / GYRO_SCALE;
 	gyroFeedback = 0;

@@ -49,7 +49,7 @@ void beeps(int vezes, int t_on, int t_off)
 
 	for (int i = 0; i < vezes; i++)
 	{
-		BEEP_ON;
+		//BEEP_ON;
 		delay_ms(t_on);
 		BEEP_OFF;
 		delay_ms(t_off);
@@ -64,6 +64,6 @@ void beeps(int vezes, int t_on, int t_off)
   */
 void beep(int duracao)
 {
-	BEEP_ON;
+	//BEEP_ON;
 	buzzerTime = duracao;
 }

@@ -71,6 +71,8 @@ extern int32_t targetSpeedX, targetSpeedW;
 extern int32_t endSpeedX, endSpeedW;
 extern int32_t accX, decX, accW, decW;
 extern bool onlyUseEncoderFeedback;
+extern bool onlyUseGyroFeedback;
+extern bool onlyUseSensorFeedback;
 
 
 #endif /* __SPEED_CONTROL_H */

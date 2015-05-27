@@ -13,7 +13,7 @@
 
 
 /* Definições do Programa ----------------------------------------------------*/
-#define DEBUG_PRINTS
+//#define DEBUG_PRINTS
 
 
 /* Variáveis Globais ---------------------------------------------------------*/
