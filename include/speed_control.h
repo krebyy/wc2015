@@ -41,6 +41,9 @@
 #define SENSOR_SCALE 1
 
 
+#define MINIMAL_SX_STRAIGHT 5
+
+
 /* Macros --------------------------------------------------------------------*/
 #define MM_TO_COUNTS(mm)	(((mm) * CNT_PER_1000MM) / 1000)
 #define SPEEDX_TO_COUNTS(speed)	((CNT_PER_1000MM * (speed * 2) * TS) / 1000000)
@@ -51,6 +54,8 @@
 #define SPEEDW_TO_COUNTS(speed)	((CNT_PER_360DEG * (speed * 2) * TS) / 360000)
 #define ACCW_TO_COUNTS(acc)		(SPEEDW_TO_COUNTS(acc / 2) / TS)
 #define COUNTS_TO_DEG(cnt)	(((cnt) * 360) / CNT_PER_360DEG)
+
+#define ACCC_TO_COUNTS(acc) (float)((float)acc * 7296.0f) / 2133.3f)
 
 
 /* Protótipos das Funções --------------------------------------------------- */

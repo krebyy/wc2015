@@ -21,8 +21,8 @@ int32_t erro = 0, erro_a = 0;
 bool run = false;
 uint32_t ticks = 0;
 
-uint32_t param_speedX_med, param_speedX_min, param_speedX_max;
-uint32_t param_accX, param_accC, param_a, param_b;
+int32_t param_speedX_med, param_speedX_min, param_speedX_max;
+int32_t param_accX, param_accC, param_a, param_b;
 int32_t param_pid_kp, param_pid_ki, param_pid_kd, param_pid_offset;
 
 int32_t trecho = 0;
@@ -46,7 +46,9 @@ int main (void)
 	// Inicio do programa ------------------------------------------------------
 	// As mensagens enviadas por printf podem ser destinadas à USB ou à UART,
 	// para isto altere a definição no arquivo main.h
+#ifdef DEBUG_PRINTS
 	printf("Winter Challenge 2015 - uMaRT LITE+ V1.1\r\n");
+#endif
 	delay_ms(100);
 
 
@@ -104,8 +106,8 @@ int main (void)
 		if (ticks >= 1000 && run == true)
 		{
 			toggleLED(LED5);
-			printf("Distacia percorrida: %d\r\n", distance_mm);
-			printf("Velocidade media: %d\r\n", distance_mm - d0);
+			printf("Distacia percorrida: %ld\r\n", distance_mm);
+			printf("Velocidade media: %ld\r\n", distance_mm - d0);
 			printf("\r\n");
 			d0 = distance_mm;
 

@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <math.h>
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_it.h"
 #include "delays.h"
@@ -46,6 +47,8 @@ void systick(void);
 void perifericosConfig(void);
 void init_parametros(void);
 
+extern int32_t param_speedX_med, param_speedX_min, param_speedX_max;
+extern int32_t param_accX, param_accC;
 extern int32_t param_pid_kp, param_pid_ki, param_pid_kd, param_pid_offset;
 
 

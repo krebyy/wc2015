@@ -28,13 +28,16 @@ int32_t oldSensorError = 0;
 
 int32_t curSpeedX = 0, curSpeedW = 0;
 
-int32_t bufferCounts[200];
-uint8_t index_buffer_counts = 0;
+int32_t bufferCounts[201];
+uint8_t index_buffer_counts = 1;
 
 int32_t bufferDistances[20] = {0};
 int32_t bufferSpeedsWm[20] = {0};
 uint8_t index_buffer_sector = 0;
 int32_t accumulatorSpeedW = 0, numSpeedW = 0;
+
+int32_t bufferSpeedXout[20] = {0};
+int32_t bufferSpeedWout[20] = {0};
 
 
 /* Variáveis externas --------------------------------------------------------*/
@@ -48,6 +51,7 @@ bool onlyUseGyroFeedback = false;
 bool onlyUseSensorFeedback = false;
 
 //#define CNTS_PRINTS
+#define RUN1_PRINTS
 
 
 /**
@@ -88,8 +92,10 @@ void speedProfile(void)
 		bufferDistances[index_buffer_sector] = distance - bufferDistances[index_buffer_sector - 1];
 		bufferSpeedsWm[index_buffer_sector] = accumulatorSpeedW / numSpeedW;
 
-		printf("D[%d] = %d\r\n", index_buffer_sector, bufferDistances[index_buffer_sector]);
-		printf("W[%d] = %d\r\n", index_buffer_sector, bufferSpeedsWm[index_buffer_sector]);
+#ifdef RUN1_PRINTS
+		printf("D[%d] = %ld\r\n", index_buffer_sector, bufferDistances[index_buffer_sector]);
+		printf("W[%d] = %ld\r\n", index_buffer_sector, bufferSpeedsWm[index_buffer_sector]);
+#endif
 
 		index_buffer_sector++;
 		accumulatorSpeedW = 0;
@@ -97,16 +103,43 @@ void speedProfile(void)
 		valid_marker = false;
 	}
 
-#ifdef CNTS_PRINTS
-	// Envia a contagem dos encoders (pacotes de 100 contagens - a cada 100ms)
-	bufferCounts[index_buffer_counts] = leftEncoderCount;
-	bufferCounts[index_buffer_counts + 1] = rightEncoderCount;
-	index_buffer_counts += 2;
-	if (index_buffer_counts == 200)
+	// Quando o robô parar na linha de chegada: calcula as velocidades do speedProfile
+	if (frun == 4 && curSpeedX == 0)
 	{
+		printf("\r\n");
+
+		for (uint8_t i = 0; i < index_buffer_sector; i++)
+		{
+			if (abs(bufferSpeedsWm[i]) < MINIMAL_SX_STRAIGHT)
+			{	// Reta
+				bufferSpeedXout[i] = SPEEDX_TO_COUNTS(param_speedX_max);
+				bufferSpeedWout[i] = 0;
+			}
+			else
+			{	// Curva
+				float ray = (float)SPEEDX_TO_COUNTS(param_speedX_med) / (float)bufferSpeedsWm[i];
+				bufferSpeedXout[i] = (int32_t)(sqrtf(ACCC_TO_COUNTS(param_accC) * abs(ray));
+				bufferSpeedWout[i] = (int32_t)(bufferSpeedXout[i] / ray);
+			}
+
+			printf("SX[%d] = %ld\r\n", i, bufferSpeedXout[i]);
+			printf("SW[%d] = %ld\r\n", i, bufferSpeedWout[i]);
+		}
+
+		frun = 5;
+	}
+
+#ifdef CNTS_PRINTS
+	// Envia as velocidades (pacotes de 100 contagens - a cada 100ms)
+	bufferCounts[index_buffer_counts] = leftEncoderChange;
+	bufferCounts[index_buffer_counts + 1] = rightEncoderChange;
+	index_buffer_counts += 2;
+	if (index_buffer_counts == 201)
+	{
+		bufferCounts[0] = 0xAAAAAAAA;
 		HAL_UART_DMAResume(&huart1);
-		HAL_UART_Transmit_DMA(&huart1, (uint8_t*)bufferCounts, 800);
-		index_buffer_counts = 0;
+		HAL_UART_Transmit_DMA(&huart1, (uint8_t*)bufferCounts, 804);
+		index_buffer_counts = 1;
 	}
 #endif
 }
@@ -215,7 +248,7 @@ void calculateMotorPwm(void) // encoder PD controller
 	posErrorW = curSpeedW - rotationalFeedback;
 
 	posPwmX = KP_X * posErrorX + KD_X * (posErrorX - oldPosErrorX);
-	posPwmW = (posErrorW / param_pid_kp) + param_pid_kd * (posErrorW - oldPosErrorW);
+	posPwmW = ((posErrorW * param_pid_kp) / 128) +  (((posErrorW - oldPosErrorW) * param_pid_kd) / 128);
 
 	oldPosErrorX = posErrorX;
 	oldPosErrorW = posErrorW;

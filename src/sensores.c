@@ -42,7 +42,7 @@ ADC_HandleTypeDef hadc1;
 
 /* Variáveis externas --------------------------------------------------------*/
 bool valid_marker = false;
-
+int32_t frun = 0;
 
 
 /**
@@ -106,12 +106,16 @@ void sensoresConfig(void)
 	// Leitura da Bateria, gera um alerta quando a tensão for menor que 7,00V
 	if (getTensao() > VBAT_ALERTA)
 	{
+#ifdef DEBUG_PRINTS
 		printf("Bateria: %d mV\r\n", getTensao());
+#endif
 		beeps(1, 50, 50);
 	}
 	else
 	{
+#ifdef DEBUG_PRINTS
 		printf("Bateria BAIXA!\r\n");
+#endif
 		beeps(5, 50, 50);
 		beep(500);
 	}
@@ -219,7 +223,7 @@ int32_t getSensorError(void)
   */
 void readMarks(void)
 {
-	static int32_t marker_corner = 0, marker_start_goal = 0, frun = 0;
+	static int32_t marker_corner = 0, marker_start_goal = 0;
 	static bool marker_intersection = false, fmarker = false;
 
 	// Detecção das marcas de partida/chegada
