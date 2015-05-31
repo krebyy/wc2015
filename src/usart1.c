@@ -124,7 +124,7 @@ int32_t comandosUART(void)
 		// Envia os dados do robô para o celular
 		if (strcmp(RxBuffer, "GET\n") == 0)
 		{
-			readFlash(buf, N_PARAMETROS);
+			readFlash(ADDR_FLASH_SECTOR_11, buf, N_PARAMETROS);
 			checksum = 0;
 			for (i = 0; i < N_PARAMETROS; i++) checksum += buf[i];
 
@@ -159,7 +159,7 @@ int32_t comandosUART(void)
 
 			if ((checksum == buf[N_PARAMETROS]) && (checksum != 0))
 			{
-				writeFlash(buf, N_PARAMETROS);
+				writeFlash(ADDR_FLASH_SECTOR_11, buf, N_PARAMETROS);
 				init_parametros();
 				printf("Dados recebidos com sucesso, checksum = %d\r\n", checksum);
 				beep(100);

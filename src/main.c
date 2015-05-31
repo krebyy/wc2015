@@ -13,7 +13,7 @@
 
 
 /* Definições do Programa ----------------------------------------------------*/
-//#define DEBUG_PRINTS
+
 
 
 /* Variáveis Globais ---------------------------------------------------------*/
@@ -59,7 +59,15 @@ int main (void)
 	// Caso inicie o robô com SW1 pressionado: alteração dos parâmetros pelas rodinhas
 	if (getSW1() == HIGH)
 	{
-		menu_rodinhas();
+		//menu_rodinhas();
+
+		while (getSW1() == HIGH);
+		beeps(2, 50, 100);
+		delay_ms(500);
+
+		flag_run = RUN_OK;
+		num_run = FAST_RUN1;
+
 	}
 
 
@@ -73,10 +81,20 @@ int main (void)
 
 	delay_ms(1000);
 
+	if (num_run == SEARCH_RUN)
+	{
+		targetSpeedX = SPEEDX_TO_COUNTS(param_speedX_med);//param_speedX_med);
+		accX = decX = ACCX_TO_COUNTS(param_accX);//param_accX);
+		distanceLeft = MM_TO_COUNTS(13155);
+	}
+	else if (num_run == FAST_RUN1)
+	{
+		useEncoderFeedback = true;
+		useSensorFeedback = true;
+		//useGyroFeedback = true;
 
-	targetSpeedX = SPEEDX_TO_COUNTS(param_speedX_med);//param_speedX_med);
-	accX = decX = ACCX_TO_COUNTS(param_accX);//param_accX);
-	distanceLeft = MM_TO_COUNTS(13155);
+		changeSpeedProfile();
+	}
 
 	resetEncoderEsquerda();
 	resetEncoderDireita();
@@ -98,6 +116,20 @@ int main (void)
 		else if (c == 1)
 		{
 			run = true;
+		}
+
+		if (fflash == true)
+		{
+			writeFlash(ADDR_FLASH_SECTOR_10, buf_temp, 3 * SIZE_BUFFER_SECTORS);
+			fflash = false;
+
+			uint32_t buf[SIZE_BUFFER_SECTORS * 3];
+			readFlash(ADDR_FLASH_SECTOR_10, buf, SIZE_BUFFER_SECTORS * 3);
+
+			for (uint32_t i = 0; i < SIZE_BUFFER_SECTORS * 3; i++)
+			{
+				printf("[%ld]: %ld\r\n", i, buf[i]);
+			}
 		}
 
 
@@ -171,7 +203,7 @@ void perifericosConfig(void)
 void init_parametros(void)
 {
 	uint32_t buf[N_PARAMETROS];
-	readFlash(buf, N_PARAMETROS);
+	readFlash(ADDR_FLASH_SECTOR_11, buf, N_PARAMETROS);
 
 	param_speedX_med = buf[0];
 	param_speedX_min = buf[1];

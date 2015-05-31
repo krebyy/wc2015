@@ -78,7 +78,7 @@
 /* Protótipos das Funções --------------------------------------------------- */
 void sensoresConfig(void);
 int32_t getSensorError(void);
-void readMarks(void);
+void readMarkers(void);
 int32_t getGyro();
 int32_t getTensao();
 uint32_t getRawADC(uint32_t canal);
@@ -86,7 +86,7 @@ uint32_t getRawADC(uint32_t canal);
 
 /* Variáveis externas --------------------------------------------------------*/
 extern bool valid_marker;
-extern int32_t frun;
+extern int32_t flag_run;
 
 
 #endif /* __SENSORES_H */

@@ -38,6 +38,8 @@
 #define STDIO_UART	// STDIO_UART ou STDIO_USB: direciona as funções de escrita
 				// e leitura (printf, scanf, putc...) para a UART ou para a USB
 
+//#define DEBUG_PRINTS
+
 /* Constantes ----------------------------------------------------------------*/
 #define N_PARAMETROS 11
 
@@ -48,7 +50,7 @@ void perifericosConfig(void);
 void init_parametros(void);
 
 extern int32_t param_speedX_med, param_speedX_min, param_speedX_max;
-extern int32_t param_accX, param_accC;
+extern int32_t param_accX, param_accC, param_a, param_b;
 extern int32_t param_pid_kp, param_pid_ki, param_pid_kd, param_pid_offset;
 
 

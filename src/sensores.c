@@ -42,7 +42,7 @@ ADC_HandleTypeDef hadc1;
 
 /* Variáveis externas --------------------------------------------------------*/
 bool valid_marker = false;
-int32_t frun = 0;
+int32_t flag_run = 0;
 
 
 /**
@@ -195,8 +195,8 @@ int32_t getSensorError(void)
 		HAL_GPIO_WritePin(R_LINE_PORT, R_LINE_PIN, LOW);
 		if (i == 100)
 		{
-			readMarks();
-			HAL_GPIO_WritePin(L_MARK_E_PORT, L_MARK_E_PORT, LOW);
+			readMarkers();
+			HAL_GPIO_WritePin(L_MARK_E_PORT, L_MARK_E_PIN, LOW);
 			HAL_GPIO_WritePin(R_MARK_E_PORT, R_MARK_E_PIN, LOW);
 		}
 		elapse_us(i * 2, t0);
@@ -221,7 +221,7 @@ int32_t getSensorError(void)
   * @param
   * @return
   */
-void readMarks(void)
+void readMarkers(void)
 {
 	static int32_t marker_corner = 0, marker_start_goal = 0;
 	static bool marker_intersection = false, fmarker = false;
@@ -275,30 +275,31 @@ void readMarks(void)
     }
 
     // start/goal marker check
-    if (frun == 0 && marker_start_goal > MARKER_TH)
+    if (flag_run == 0 && marker_start_goal > MARKER_TH)
     {	// start marker detect
-    	frun = 1;
+    	flag_run = 1;
     }
-    if (frun == 1 && marker_start_goal == 0)
+    if (flag_run == 1 && marker_start_goal == 0)
     {	// start marker fix
-		frun=2;
+		flag_run=2;
 		beep(200);
 
 		valid_marker = true;
     }
-    if (frun == 2 && marker_start_goal > MARKER_TH)
+    if (flag_run == 2 && marker_start_goal > MARKER_TH)
     {	// goal marker detect
-		frun = 3;
+		flag_run = 3;
     }
-    if (frun == 3 && marker_intersection == true)
+    if (flag_run == 3 && marker_intersection == true)
     {	// ignore intersection
-		frun = 2;
+		flag_run = 2;
     }
-    if (frun == 3 && marker_start_goal == 0)
+    if (flag_run == 3 && marker_start_goal == 0)
     {	// goal marker fix
-		frun = 4;
+		flag_run = GOAL_OK;
 		beep(200);
 		distanceLeft = MM_TO_COUNTS(150);
+		endSpeedX = 0;
 
 		valid_marker = true;
     }

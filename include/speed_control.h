@@ -43,6 +43,16 @@
 
 #define MINIMAL_SX_STRAIGHT 5
 
+#define SIZE_BUFFER_SECTORS		20
+
+#define SEARCH_RUN		0
+#define FAST_RUN1		1
+#define FAST_RUN2		2
+
+#define GOAL_OK			4
+#define RUN_OK			5
+#define WAIT			6
+
 
 /* Macros --------------------------------------------------------------------*/
 #define MM_TO_COUNTS(mm)	(((mm) * CNT_PER_1000MM) / 1000)
@@ -68,6 +78,10 @@ void calculateMotorPwm(void);
 int32_t needToDecelerate(int32_t, int32_t, int32_t);
 void resetProfile(void);
 
+void recordsSectors(void);
+void changeRuns(void);
+void changeSpeedProfile(void);
+
 
 /* Variáveis externas --------------------------------------------------------*/
 extern TIM_HandleTypeDef htim3;
@@ -75,9 +89,12 @@ extern int32_t distanceLeft, distance_mm;
 extern int32_t targetSpeedX, targetSpeedW;
 extern int32_t endSpeedX, endSpeedW;
 extern int32_t accX, decX, accW, decW;
-extern bool onlyUseEncoderFeedback;
-extern bool onlyUseGyroFeedback;
-extern bool onlyUseSensorFeedback;
+extern bool useEncoderFeedback;
+extern bool useGyroFeedback;
+extern bool useSensorFeedback;
+extern uint8_t num_run;
+extern int32_t buf_temp[3 * SIZE_BUFFER_SECTORS];
+extern bool fflash;
 
 
 #endif /* __SPEED_CONTROL_H */

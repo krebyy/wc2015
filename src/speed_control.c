@@ -30,14 +30,17 @@ int32_t curSpeedX = 0, curSpeedW = 0;
 
 int32_t bufferCounts[201];
 uint8_t index_buffer_counts = 1;
+//uint8_t c_aux = 0;
 
 int32_t bufferDistances[20] = {0};
 int32_t bufferSpeedsWm[20] = {0};
 uint8_t index_buffer_sector = 0;
 int32_t accumulatorSpeedW = 0, numSpeedW = 0;
 
-int32_t bufferSpeedXout[20] = {0};
-int32_t bufferSpeedWout[20] = {0};
+int32_t bufferSpeedXout[SIZE_BUFFER_SECTORS] = {0};
+int32_t bufferSpeedWout[SIZE_BUFFER_SECTORS] = {0};
+
+
 
 
 /* Variáveis externas --------------------------------------------------------*/
@@ -46,12 +49,19 @@ int32_t targetSpeedX = 0, targetSpeedW = 0;
 int32_t endSpeedX = 0, endSpeedW = 0;
 int32_t accX = 0, decX = 0, accW = 0, decW = 0;
 
-bool onlyUseEncoderFeedback = false;
-bool onlyUseGyroFeedback = false;
-bool onlyUseSensorFeedback = false;
+bool useEncoderFeedback = false;
+bool useGyroFeedback = false;
+bool useSensorFeedback = true;
 
-//#define CNTS_PRINTS
-#define RUN1_PRINTS
+uint8_t num_run = SEARCH_RUN;
+
+int32_t buf_temp[3 * SIZE_BUFFER_SECTORS];
+bool fflash = false;
+
+/* Definições do programa ----------------------------------------------------*/
+//#define LFT_PRINTS	// Habilita o envio dos valores para o software LFTrakking
+#define SEARCH_RUN_PRINTS	// Habilita mensagens de debug da searchRun
+//#define FAST_RUNS_PRINTS	// Habilita mensagens de debug para as fastRuns
 
 
 /**
@@ -86,60 +96,24 @@ void speedProfile(void)
 	updateCurrentSpeed();
 	calculateMotorPwm();
 
-	// Registra a distância do trecho e o SpeedW_médio
-	if (valid_marker == true)
-	{
-		bufferDistances[index_buffer_sector] = distance - bufferDistances[index_buffer_sector - 1];
-		bufferSpeedsWm[index_buffer_sector] = accumulatorSpeedW / numSpeedW;
+	recordsSectors();	// Registra a distância do trecho e o SpeedW_médio
+	changeRuns();		// Tratamento das voltas (searchRun, fastRun1 e fastRun2)
 
-#ifdef RUN1_PRINTS
-		printf("D[%d] = %ld\r\n", index_buffer_sector, bufferDistances[index_buffer_sector]);
-		printf("W[%d] = %ld\r\n", index_buffer_sector, bufferSpeedsWm[index_buffer_sector]);
-#endif
 
-		index_buffer_sector++;
-		accumulatorSpeedW = 0;
-		numSpeedW = 0;
-		valid_marker = false;
-	}
 
-	// Quando o robô parar na linha de chegada: calcula as velocidades do speedProfile
-	if (frun == 4 && curSpeedX == 0)
-	{
-		printf("\r\n");
-
-		for (uint8_t i = 0; i < index_buffer_sector; i++)
-		{
-			if (abs(bufferSpeedsWm[i]) < MINIMAL_SX_STRAIGHT)
-			{	// Reta
-				bufferSpeedXout[i] = SPEEDX_TO_COUNTS(param_speedX_max);
-				bufferSpeedWout[i] = 0;
-			}
-			else
-			{	// Curva
-				float ray = (float)SPEEDX_TO_COUNTS(param_speedX_med) / (float)bufferSpeedsWm[i];
-				bufferSpeedXout[i] = (int32_t)(sqrtf(ACCC_TO_COUNTS(param_accC) * abs(ray));
-				bufferSpeedWout[i] = (int32_t)(bufferSpeedXout[i] / ray);
-			}
-
-			printf("SX[%d] = %ld\r\n", i, bufferSpeedXout[i]);
-			printf("SW[%d] = %ld\r\n", i, bufferSpeedWout[i]);
-		}
-
-		frun = 5;
-	}
-
-#ifdef CNTS_PRINTS
+#ifdef LFT_PRINTS
 	// Envia as velocidades (pacotes de 100 contagens - a cada 100ms)
 	bufferCounts[index_buffer_counts] = leftEncoderChange;
 	bufferCounts[index_buffer_counts + 1] = rightEncoderChange;
 	index_buffer_counts += 2;
-	if (index_buffer_counts == 201)
+	if (index_buffer_counts == 201)// && c_aux < 100)
 	{
 		bufferCounts[0] = 0xAAAAAAAA;
 		HAL_UART_DMAResume(&huart1);
 		HAL_UART_Transmit_DMA(&huart1, (uint8_t*)bufferCounts, 804);
 		index_buffer_counts = 1;
+
+		//c_aux++;
 	}
 #endif
 }
@@ -214,51 +188,56 @@ void updateCurrentSpeed(void)
 
 void calculateMotorPwm(void) // encoder PD controller
 {
+	int32_t rotationalFeedback = 0;
 	int32_t gyroFeedback;
-	int32_t rotationalFeedback;
 	int32_t sensorFeedback;
 
 	int32_t encoderFeedbackX, encoderFeedbackW;
 	int32_t posPwmX, posPwmW;
 
-    /* simple PD loop to generate base speed for both motors */
+    // Feedbacks dos encoders
 	encoderFeedbackX = rightEncoderChange + leftEncoderChange;
 	encoderFeedbackW = rightEncoderChange - leftEncoderChange;
 
 	accumulatorSpeedW += encoderFeedbackW;
 	numSpeedW++;
 
+	// Leitura do giroscópio
 	//gyroFeedback = getGyro() / GYRO_SCALE;
 	gyroFeedback = 0;
 
+	// Leitura dos sensores de linha
 	sensorFeedback = getSensorError();
 	if (sensorFeedback == INFINITO) sensorFeedback = oldSensorError;
 	oldSensorError = sensorFeedback;
 	sensorFeedback /= SENSOR_SCALE;
 
-	/*if(onlyUseGyroFeedback == true)
-		rotationalFeedback = gyroFeedback;
-	else if(onlyUseEncoderFeedback == true)
-		rotationalFeedback = encoderFeedbackW;
-	else
-		rotationalFeedback = encoderFeedbackW + gyroFeedback + sensorFeedback;*/
-	rotationalFeedback = sensorFeedback;
+	// Habilita os feedback selecionados
+	if (useEncoderFeedback == true) rotationalFeedback += sensorFeedback;
+	if (useGyroFeedback == true) rotationalFeedback += gyroFeedback;
+	if (useSensorFeedback == true) rotationalFeedback += sensorFeedback;
 
+	// Calculo do erro
 	posErrorX += curSpeedX - encoderFeedbackX;
-	posErrorW = curSpeedW - rotationalFeedback;
+	if (num_run == SEARCH_RUN) posErrorW = curSpeedW - rotationalFeedback;
+	else if (flag_run < RUN_OK) posErrorW += curSpeedW - rotationalFeedback;
+	else posErrorW = 0;
+	//posErrorW = curSpeedW - rotationalFeedback;
 
+	// Controladores PDs para ambos motores
 	posPwmX = KP_X * posErrorX + KD_X * (posErrorX - oldPosErrorX);
 	posPwmW = ((posErrorW * param_pid_kp) / 128) +  (((posErrorW - oldPosErrorW) * param_pid_kd) / 128);
 
 	oldPosErrorX = posErrorX;
 	oldPosErrorW = posErrorW;
 
+	// Indica através dos LEDs o sinal do erro
 	if (sensorFeedback < 0) setLED(LED1, HIGH);
 	else setLED(LED1, LOW);
-
 	if (sensorFeedback > 0) setLED(LED3, HIGH);
 	else setLED(LED3, LOW);
 
+	// Aciona os motores
 	setMotores(posPwmX - posPwmW, posPwmX + posPwmW);
 }
 
@@ -279,7 +258,142 @@ int32_t needToDecelerate(int32_t dist, int32_t curSpd, int32_t endSpd)
 
 void resetProfile(void)
 {
-	//curSpeedX = curSpeedW = 0;
+	curSpeedX = curSpeedW = 0;
 	posErrorX = posErrorW = 0;
 	oldPosErrorX = oldPosErrorW = 0;
+	distanceLeft = 0;
+}
+
+
+void recordsSectors(void)
+{
+	// Registra a distância do trecho e o SpeedW_médio
+	if (num_run == SEARCH_RUN && valid_marker == true)
+	{
+		bufferDistances[index_buffer_sector] = distance - bufferDistances[index_buffer_sector - 1];
+		bufferSpeedsWm[index_buffer_sector] = accumulatorSpeedW / numSpeedW;
+
+#ifdef SEARCH_RUN_PRINTS
+		printf("D[%d] = %ld\r\n", index_buffer_sector, bufferDistances[index_buffer_sector]);
+		printf("W[%d] = %ld\r\n", index_buffer_sector, bufferSpeedsWm[index_buffer_sector]);
+#endif
+
+		index_buffer_sector++;
+		accumulatorSpeedW = 0;
+		numSpeedW = 0;
+		valid_marker = false;
+	}
+}
+
+void changeRuns(void)
+{
+	static uint32_t delay_start = 0;
+
+	switch (num_run)
+	{
+		case SEARCH_RUN:
+			// Quando o robô parar na linha de chegada: calcula as velocidades do speedProfile
+			if (flag_run == GOAL_OK && curSpeedX == 0)
+			{
+#ifdef SEARCH_RUN_PRINTS
+				printf("\r\n");
+#endif
+
+				// Calculo dos parametros do speedProfile
+				for (uint8_t i = 0; i < index_buffer_sector; i++)
+				{
+					if (abs(bufferSpeedsWm[i]) < MINIMAL_SX_STRAIGHT)
+					{	// Reta
+						bufferSpeedXout[i] = SPEEDX_TO_COUNTS(param_speedX_max);
+						bufferSpeedWout[i] = 0;
+					}
+					else
+					{	// Curva
+						float ray = (float)SPEEDX_TO_COUNTS(param_speedX_med) / (float)bufferSpeedsWm[i];
+						bufferSpeedXout[i] = (int32_t)(sqrtf(ACCC_TO_COUNTS(param_accC) * abs(ray));
+						bufferSpeedWout[i] = (int32_t)(bufferSpeedXout[i] / ray);
+					}
+#ifdef SEARCH_RUN_PRINTS
+					printf("SX[%d] = %ld\r\n", i, bufferSpeedXout[i]);
+					printf("SW[%d] = %ld\r\n", i, bufferSpeedWout[i]);
+#endif
+				}
+
+				// Cocatena os buffers e grava na flash
+				uint32_t count = 0;
+				memcpy(&buf_temp[count], bufferSpeedXout, 4 * SIZE_BUFFER_SECTORS);
+				count += SIZE_BUFFER_SECTORS;
+				memcpy(&buf_temp[count], bufferSpeedWout, 4 * SIZE_BUFFER_SECTORS);
+				count += SIZE_BUFFER_SECTORS;
+				memcpy(&buf_temp[count], bufferDistances, 4 * SIZE_BUFFER_SECTORS);
+				fflash = true;
+				setMotores(0, 0);
+
+				// Atualiza o estado
+				flag_run = RUN_OK;
+				num_run = FAST_RUN1;
+
+				resetProfile();
+			}
+			break;
+
+
+		case FAST_RUN1:
+			if (flag_run == RUN_OK)
+			{
+				if (getSW1() == HIGH)
+				{
+					delay_start = 0;
+					flag_run = WAIT;
+					beep(300);
+				}
+			}
+
+			if (flag_run == WAIT)
+			{
+				if (++delay_start == 1000)
+				{
+					useEncoderFeedback = true;
+					useSensorFeedback = true;
+					//useGyroFeedback = true;
+
+					valid_marker = false;
+					index_buffer_sector = 0;
+
+					changeSpeedProfile();
+
+					flag_run = 0;
+				}
+			}
+
+			if (valid_marker == true)
+			{
+				index_buffer_sector++;
+				changeSpeedProfile();
+
+				valid_marker = false;
+			}
+
+			if (flag_run == GOAL_OK && curSpeedX == 0)
+			{
+				flag_run = RUN_OK;
+				num_run = FAST_RUN2;
+			}
+			break;
+
+		case FAST_RUN2:
+			break;
+	}
+}
+
+
+void changeSpeedProfile(void)
+{
+	targetSpeedX = bufferSpeedXout[index_buffer_sector];
+	endSpeedX = bufferSpeedXout[index_buffer_sector + 1];
+
+	targetSpeedW = bufferSpeedWout[index_buffer_sector];
+	endSpeedW = bufferSpeedWout[index_buffer_sector + 1];
+
+	distanceLeft = bufferDistances[index_buffer_sector];
 }

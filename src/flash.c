@@ -18,13 +18,18 @@
   * @param num_words: tamanho do buffer
   * @return 0: erro durante a gravação; 1: gravação realizada com sucesso
   */
-uint8_t writeFlash(uint32_t *buffer, uint32_t num_words)
+uint8_t writeFlash(uint32_t startAddress, uint32_t *buffer, uint32_t num_words)
 {
-	uint32_t startAddress = ADDR_FLASH_SECTOR;
-
 	HAL_FLASH_Unlock();
 
-	FLASH_Erase_Sector(FLASH_SECTOR, VOLTAGE_RANGE_3);
+	if (startAddress == ADDR_FLASH_SECTOR_10)
+	{
+		FLASH_Erase_Sector(FLASH_SECTOR_10, VOLTAGE_RANGE_3);
+	}
+	else if (startAddress == ADDR_FLASH_SECTOR_11)
+	{
+		FLASH_Erase_Sector(FLASH_SECTOR_11, VOLTAGE_RANGE_3);
+	}
 
 	for (uint32_t i = 0; i < num_words; i++)
 	{
@@ -47,10 +52,8 @@ uint8_t writeFlash(uint32_t *buffer, uint32_t num_words)
   * @param num_words (tamanho do buffer)
   * @return nenhum
   */
-void readFlash(uint32_t *buffer, uint32_t num_words)
+void readFlash(uint32_t startAddress, uint32_t *buffer, uint32_t num_words)
 {
-	uint32_t startAddress = ADDR_FLASH_SECTOR;
-
 	for (uint32_t i = 0; i < num_words; i++)
 	{
 		buffer[i] = *(uint32_t *)(startAddress + (i*4));
