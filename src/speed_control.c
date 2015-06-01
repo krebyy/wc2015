@@ -28,7 +28,7 @@ int32_t oldSensorError = 0;
 
 int32_t curSpeedX = 0, curSpeedW = 0;
 
-int32_t bufferCounts[201];
+int32_t bufferLFT[201];
 uint8_t index_buffer_counts = 1;
 //uint8_t c_aux = 0;
 
@@ -59,8 +59,8 @@ int32_t buf_temp[3 * SIZE_BUFFER_SECTORS];
 bool fflash = false;
 
 /* Definições do programa ----------------------------------------------------*/
-//#define LFT_PRINTS	// Habilita o envio dos valores para o software LFTrakking
-#define SEARCH_RUN_PRINTS	// Habilita mensagens de debug da searchRun
+#define LFT_PRINTS	// Habilita o envio dos valores para o software LFTrakking
+//#define SEARCH_RUN_PRINTS	// Habilita mensagens de debug da searchRun
 //#define FAST_RUNS_PRINTS	// Habilita mensagens de debug para as fastRuns
 
 
@@ -103,14 +103,18 @@ void speedProfile(void)
 
 #ifdef LFT_PRINTS
 	// Envia as velocidades (pacotes de 100 contagens - a cada 100ms)
-	bufferCounts[index_buffer_counts] = leftEncoderChange;
-	bufferCounts[index_buffer_counts + 1] = rightEncoderChange;
+	//bufferLFT[index_buffer_counts] = leftEncoderChange;
+	//bufferLFT[index_buffer_counts + 1] = rightEncoderChange;
+
+	bufferLFT[index_buffer_counts] = curSpeedX;
+	bufferLFT[index_buffer_counts + 1] = encoderChange;
+
 	index_buffer_counts += 2;
 	if (index_buffer_counts == 201)// && c_aux < 100)
 	{
-		bufferCounts[0] = 0xAAAAAAAA;
+		bufferLFT[0] = 0xAAAAAAAA;
 		HAL_UART_DMAResume(&huart1);
-		HAL_UART_Transmit_DMA(&huart1, (uint8_t*)bufferCounts, 804);
+		HAL_UART_Transmit_DMA(&huart1, (uint8_t*)bufferLFT, 804);
 		index_buffer_counts = 1;
 
 		//c_aux++;
@@ -267,11 +271,15 @@ void resetProfile(void)
 
 void recordsSectors(void)
 {
+	static oldDistance = 0;
+
 	// Registra a distância do trecho e o SpeedW_médio
 	if (num_run == SEARCH_RUN && valid_marker == true)
 	{
-		bufferDistances[index_buffer_sector] = distance - bufferDistances[index_buffer_sector - 1];
+
+		bufferDistances[index_buffer_sector] = distance - oldDistance;
 		bufferSpeedsWm[index_buffer_sector] = accumulatorSpeedW / numSpeedW;
+		oldDistance = distance;
 
 #ifdef SEARCH_RUN_PRINTS
 		printf("D[%d] = %ld\r\n", index_buffer_sector, bufferDistances[index_buffer_sector]);
@@ -309,8 +317,9 @@ void changeRuns(void)
 					}
 					else
 					{	// Curva
-						float ray = (float)SPEEDX_TO_COUNTS(param_speedX_med) / (float)bufferSpeedsWm[i];
-						bufferSpeedXout[i] = (int32_t)(sqrtf(ACCC_TO_COUNTS(param_accC) * abs(ray));
+						float ray = ((float)SPEEDX_TO_COUNTS(param_speedX_med) / (float)bufferSpeedsWm[i]);
+						bufferSpeedXout[i] = (int32_t)(sqrtf(ACCC_TO_COUNTS(param_accC) * abs(ray * W_2)));
+						if (bufferSpeedXout[i] > SPEEDX_TO_COUNTS(param_speedX_max)) bufferSpeedXout[i] = SPEEDX_TO_COUNTS(param_speedX_max);
 						bufferSpeedWout[i] = (int32_t)(bufferSpeedXout[i] / ray);
 					}
 #ifdef SEARCH_RUN_PRINTS

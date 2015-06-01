@@ -35,6 +35,7 @@
 
 #define CNT_PER_1000MM 142400	// = (1000*PPR) / (W_DIAMETER*PI)
 #define CNT_PER_360DEG 37120	// = ((2*PI*W_DISTANCE)*CNT_PER_1000MM)/(2*1000)
+#define W_DISTANCE	83
 
 
 #define GYRO_SCALE 1
@@ -65,7 +66,9 @@
 #define ACCW_TO_COUNTS(acc)		(SPEEDW_TO_COUNTS(acc / 2) / TS)
 #define COUNTS_TO_DEG(cnt)	(((cnt) * 360) / CNT_PER_360DEG)
 
-#define ACCC_TO_COUNTS(acc) (float)((float)acc * 7296.0f) / 2133.3f)
+#define ACCC_TO_COUNTS(acc) (float)((float)acc / 1768.6351f)
+
+#define W_2		(float)((float)MM_TO_COUNTS(W_DISTANCE) / 2.0f)
 
 
 /* Protótipos das Funções --------------------------------------------------- */
