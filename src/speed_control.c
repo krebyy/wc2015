@@ -30,7 +30,7 @@ int32_t oldSensorError = 0;
 int32_t curSpeedX = 0, curSpeedW = 0;
 
 int32_t bufferLFT[201];
-uint8_t index_buffer_counts = 1;
+uint8_t index_buffer_lft = 1;
 //uint8_t c_aux = 0;
 
 int32_t bufferDistances[20] = {0};
@@ -104,24 +104,24 @@ void speedProfile(void)
 
 #ifdef LFT_PRINTS
 	// Envia as velocidades (pacotes de 100 contagens - a cada 100ms)
-	//bufferLFT[index_buffer_counts] = leftEncoderChange;
-	//bufferLFT[index_buffer_counts + 1] = rightEncoderChange;
+	//bufferLFT[index_buffer_lft] = leftEncoderChange;
+	//bufferLFT[index_buffer_lft + 1] = rightEncoderChange;
 
 	// Envia a resposta da velocidade SpeedX
-	bufferLFT[index_buffer_counts] = curSpeedX;
-	bufferLFT[index_buffer_counts + 1] = 2 * encoderChange;
+	bufferLFT[index_buffer_lft] = curSpeedX;
+	bufferLFT[index_buffer_lft + 1] = 2 * encoderChange;
 
 	// Envia a resposta da velocidade SpeedW
-	//bufferLFT[index_buffer_counts] = curSpeedW;
-	//bufferLFT[index_buffer_counts + 1] = rotationalFeedback;
+	//bufferLFT[index_buffer_lft] = curSpeedW;
+	//bufferLFT[index_buffer_lft + 1] = rotationalFeedback;
 
-	index_buffer_counts += 2;
-	if (index_buffer_counts == 201)// && c_aux < 100)
+	index_buffer_lft += 2;
+	if (index_buffer_lft == 201)// && c_aux < 100)
 	{
 		bufferLFT[0] = 0xAAAAAAAA;
 		HAL_UART_DMAResume(&huart1);
 		HAL_UART_Transmit_DMA(&huart1, (uint8_t*)bufferLFT, 804);
-		index_buffer_counts = 1;
+		index_buffer_lft = 1;
 
 		//c_aux++;
 	}

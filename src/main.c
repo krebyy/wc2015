@@ -81,6 +81,8 @@ int main (void)
 
 	delay_ms(1000);
 
+	accX = decX = 2;//ACCX_TO_COUNTS(500);//param_accX);
+	accW = decW = 2;
 	if (num_run == SEARCH_RUN)
 	{
 		useEncoderFeedback = false;
@@ -88,8 +90,6 @@ int main (void)
 		useSensorFeedback = true;
 
 		targetSpeedX = SPEEDX_TO_COUNTS(param_speedX_med);
-		accX = decX = 2;//ACCX_TO_COUNTS(500);//param_accX);
-		accW = decW = 2;
 		distanceLeft = MM_TO_COUNTS(10000);
 	}
 	else if (num_run == FAST_RUN1)
@@ -99,7 +99,7 @@ int main (void)
 		//useGyroFeedback = true;
 
 		updateBufferSpeedProfile();
-		changeSpeedProfile();
+		//changeSpeedProfile();
 	}
 
 	resetEncoderEsquerda();
