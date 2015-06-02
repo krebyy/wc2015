@@ -21,9 +21,9 @@ int32_t erro = 0, erro_a = 0;
 bool run = false;
 uint32_t ticks = 0;
 
-int32_t param_speedX_med, param_speedX_min, param_speedX_max;
-int32_t param_accX, param_accC, param_a, param_b;
-int32_t param_pid_kp, param_pid_ki, param_pid_kd, param_pid_offset;
+int32_t param_speedX_med, param_topSpeed1, param_topSpeed2;
+int32_t param_pid_kp, param_pid_kd, param_scale_sensor, param_scale_gyro;
+int32_t param_accX1, param_accC1, param_accX2, param_accC2;
 
 int32_t trecho = 0;
 
@@ -65,7 +65,7 @@ int main (void)
 		beeps(2, 50, 100);
 		delay_ms(500);
 
-		flag_run = RUN_OK;
+		flag_run = 0;
 		num_run = FAST_RUN1;
 
 	}
@@ -81,26 +81,9 @@ int main (void)
 
 	delay_ms(1000);
 
-	accX = decX = 2;//ACCX_TO_COUNTS(500);//param_accX);
-	accW = decW = 2;
-	if (num_run == SEARCH_RUN)
-	{
-		useEncoderFeedback = false;
-		useGyroFeedback = false;
-		useSensorFeedback = true;
 
-		targetSpeedX = SPEEDX_TO_COUNTS(param_speedX_med);
-		distanceLeft = MM_TO_COUNTS(10000);
-	}
-	else if (num_run == FAST_RUN1)
-	{
-		useEncoderFeedback = true;
-		useSensorFeedback = true;
-		//useGyroFeedback = true;
-
-		updateBufferSpeedProfile();
-		//changeSpeedProfile();
-	}
+	// Seleciona os parâmetros da respectiva corrida (searchRun, fastRun1 e fastRun2)
+	initializeRun();
 
 	resetEncoderEsquerda();
 	resetEncoderDireita();
@@ -109,33 +92,82 @@ int main (void)
 
 
 	// Loop principal ----------------------------------------------------------
-	HAL_UART_Receive_IT(&huart1, &RxByte, 1);
 	while (1)
 	{
-		int32_t c = comandosUART();
-		if (c == 0)
+		switch (num_run)
 		{
-			run = false;
-			beep(50);
-			setMotores(0, 0);
-		}
-		else if (c == 1)
-		{
-			run = true;
-		}
+			case SEARCH_RUN:	// Corrida de de reconhecimento ****************
+				if (flag_run == RUN_OK)
+				{
+					run = false;
+					recordSectors();
 
-		if (fflash == true)
-		{
-			writeFlash(ADDR_FLASH_SECTOR_10, buf_temp, 3 * SIZE_BUFFER_SECTORS);
-			fflash = false;
+					calculateSpeedProfile(param_topSpeed1, param_accC1);
+					resetProfile();
 
-			uint32_t buf[SIZE_BUFFER_SECTORS * 3];
-			readFlash(ADDR_FLASH_SECTOR_10, buf, SIZE_BUFFER_SECTORS * 3);
+					num_run = FAST_RUN1;
+					flag_run = PAUSE;
+				}
+				break;
 
-			for (uint32_t i = 0; i < SIZE_BUFFER_SECTORS * 3; i++)
-			{
-				printf("[%ld]: %ld\r\n", i, buf[i]);
-			}
+
+			case FAST_RUN1:	// Corrida rápida 1 ********************************
+				if (run == false)
+				{
+					while (getSW1() == LOW);
+
+					beeps(2, 50, 50);
+					delay_ms(1000);
+
+					useEncoderFeedback = true;
+					useSensorFeedback = true;
+					useGyroFeedback = false;
+
+					valid_marker = false;
+
+					changeSpeedProfile();
+
+					flag_run = 0;
+					run = true;
+				}
+
+				if (flag_run == RUN_OK)
+				{
+					run = false;
+					calculateSpeedProfile(param_topSpeed2, param_accC2);
+					resetProfile();
+
+					num_run = FAST_RUN2;
+					flag_run = PAUSE;
+				}
+				break;
+
+
+			case FAST_RUN2:	// Corrida rápida 2 ********************************
+				if (run == false)
+				{
+					while (getSW1() == LOW);
+
+					beeps(3, 50, 50);
+					delay_ms(1000);
+
+					useEncoderFeedback = true;
+					useSensorFeedback = true;
+					useGyroFeedback = false;
+
+					valid_marker = false;
+
+					changeSpeedProfile();
+
+					flag_run = 0;
+					run = true;
+				}
+				break;
+
+
+			case STOP:
+				run = false;
+				break;
 		}
 
 
@@ -211,19 +243,77 @@ void init_parametros(void)
 	uint32_t buf[N_PARAMETROS];
 	readFlash(ADDR_FLASH_SECTOR_11, buf, N_PARAMETROS);
 
+	// Velocidades
 	param_speedX_med = buf[0];
-	param_speedX_min = buf[1];
-	param_speedX_max = buf[2];
+	param_topSpeed1 = buf[1];
+	param_topSpeed2 = buf[2];
 
+	// Controlador
 	param_pid_kp = buf[3];
-	param_pid_ki = buf[4];
-	param_pid_kd = buf[5];
-	param_pid_offset = buf[6];
+	param_pid_kd = buf[4];
+	param_scale_sensor = buf[5];
+	param_scale_gyro = buf[6];
 
-	param_accX = buf[7];
-	param_accC = buf[8];
-
-	param_a = buf[9];
-	param_b = buf[10];
+	// Acelerações
+	param_accX1 = buf[7];
+	param_accC1 = buf[8];
+	param_accX2 = buf[9];
+	param_accC2 = buf[10];
 }
 
+
+void initializeRun(void)
+{
+	accX = decX = 2;//ACCX_TO_COUNTS(500);//param_accX);
+	accW = decW = 2;
+
+	switch (num_run)
+	{
+		case SEARCH_RUN:	// Corrida de de reconhecimento ********************
+			useEncoderFeedback = false;
+			useGyroFeedback = false;
+			useSensorFeedback = true;
+
+			targetSpeedX = SPEEDX_TO_COUNTS(param_speedX_med);
+			distanceLeft = MM_TO_COUNTS(10000);
+			break;
+
+
+		case FAST_RUN1:	// Corrida rápida 1 ************************************
+			useEncoderFeedback = true;
+			useSensorFeedback = true;
+			useGyroFeedback = false;
+
+			updateBufferSpeedProfile();
+			calculateSpeedProfile(param_topSpeed1, param_accC1);
+			changeSpeedProfile();
+			break;
+
+
+		case FAST_RUN2:	// Corrida rápida 2 ************************************
+			useEncoderFeedback = true;
+			useSensorFeedback = true;
+			useGyroFeedback = false;
+
+			updateBufferSpeedProfile();
+			calculateSpeedProfile(param_topSpeed2, param_accC2);
+			changeSpeedProfile();
+			break;
+	}
+}
+
+
+void recordSectors(void)
+{
+	writeFlash(ADDR_FLASH_SECTOR_10, buf_temp, 2 * SIZE_BUFFER_SECTORS);
+
+#ifdef DEBUG_PRINTS
+	uint32_t buf[SIZE_BUFFER_SECTORS * 2];
+	readFlash(ADDR_FLASH_SECTOR_10, buf, SIZE_BUFFER_SECTORS * 2);
+
+	for (uint32_t i = 0; i < SIZE_BUFFER_SECTORS * 2; i++)
+	{
+		printf("[%ld]: %ld\r\n", i, buf[i]);
+	}
+#endif
+}

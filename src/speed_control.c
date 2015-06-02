@@ -42,8 +42,6 @@ int32_t bufferSpeedXout[SIZE_BUFFER_SECTORS] = {0};
 int32_t bufferSpeedWout[SIZE_BUFFER_SECTORS] = {0};
 
 
-
-
 /* Variáveis externas --------------------------------------------------------*/
 int32_t distanceLeft = 0, distance_mm = 0;
 int32_t targetSpeedX = 0, targetSpeedW = 0;
@@ -57,11 +55,10 @@ bool useSensorFeedback = true;
 uint8_t num_run = SEARCH_RUN;
 
 int32_t buf_temp[3 * SIZE_BUFFER_SECTORS];
-bool fflash = false;
 
 /* Definições do programa ----------------------------------------------------*/
 //#define LFT_PRINTS	// Habilita o envio dos valores para o software LFTrakking
-//#define SEARCH_RUN_PRINTS	// Habilita mensagens de debug da searchRun
+#define SEARCH_RUN_PRINTS	// Habilita mensagens de debug da searchRun
 //#define FAST_RUNS_PRINTS	// Habilita mensagens de debug para as fastRuns
 
 
@@ -91,41 +88,15 @@ void speedControlConfig(void)
 }
 
 
+
 void speedProfile(void)
 {
-	getEncoderStatus();
-	updateCurrentSpeed();
-	calculateMotorPwm();
+	getEncoderStatus();		// Leitura dos encoders e atualização da distância
+	updateCurrentSpeed();	// Atualiza os setpoints de velocidades do speedProfile
+	calculateMotorPwm();	// Controlador de velocidade dos motores
 
-	recordsSectors();	// Registra a distância do trecho e o SpeedW_médio
-	changeRuns();		// Tratamento das voltas (searchRun, fastRun1 e fastRun2)
-
-
-
-#ifdef LFT_PRINTS
-	// Envia as velocidades (pacotes de 100 contagens - a cada 100ms)
-	//bufferLFT[index_buffer_lft] = leftEncoderChange;
-	//bufferLFT[index_buffer_lft + 1] = rightEncoderChange;
-
-	// Envia a resposta da velocidade SpeedX
-	bufferLFT[index_buffer_lft] = curSpeedX;
-	bufferLFT[index_buffer_lft + 1] = 2 * encoderChange;
-
-	// Envia a resposta da velocidade SpeedW
-	//bufferLFT[index_buffer_lft] = curSpeedW;
-	//bufferLFT[index_buffer_lft + 1] = rotationalFeedback;
-
-	index_buffer_lft += 2;
-	if (index_buffer_lft == 201)// && c_aux < 100)
-	{
-		bufferLFT[0] = 0xAAAAAAAA;
-		HAL_UART_DMAResume(&huart1);
-		HAL_UART_Transmit_DMA(&huart1, (uint8_t*)bufferLFT, 804);
-		index_buffer_lft = 1;
-
-		//c_aux++;
-	}
-#endif
+	manageRuns();	// Tratamento das voltas (searchRun, fastRun1 e fastRun2)
+	writeLFT();		// Envio de dados ao software LFTrakking
 }
 
 
@@ -155,45 +126,40 @@ void getEncoderStatus(void)
 
 void updateCurrentSpeed(void)
 {
-	//if (targetSpeedW == 0)
-	//{
-		if (needToDecelerate(distanceLeft, curSpeedX, endSpeedX) > decX)
-		{
-			targetSpeedX = endSpeedX;
-			targetSpeedW = endSpeedW;
-		}
+	// Calcula para saber se chegou o momento de desacelerar
+	if (needToDecelerate(distanceLeft, curSpeedX, endSpeedX) > decX)
+	{
+		targetSpeedX = endSpeedX;
+		targetSpeedW = endSpeedW;
+	}
+
+	// Gera o speedProfile do SpeedX (movimento translacional)
+	if(curSpeedX < targetSpeedX)
+	{
+		curSpeedX += accX;
+		if(curSpeedX > targetSpeedX)
+			curSpeedX = targetSpeedX;
+	}
+	else if(curSpeedX > targetSpeedX)
+	{
+		curSpeedX -= decX;
 		if(curSpeedX < targetSpeedX)
-		{
-			curSpeedX += accX;
-			if(curSpeedX > targetSpeedX)
-				curSpeedX = targetSpeedX;
-		}
-		else if(curSpeedX > targetSpeedX)
-		{
-			curSpeedX -= decX;
-			if(curSpeedX < targetSpeedX)
-				curSpeedX = targetSpeedX;
-		}
-	//}
-	//else
-	//{
-		//if (needToDecelerate(distanceLeft, curSpeedW, endSpeedW) > decW)
-		//{
-		//	targetSpeedW = endSpeedW;
-		//}
+			curSpeedX = targetSpeedX;
+	}
+
+	// Gera o speedProfile do SpeedW (movimento rotacional)
+	if(curSpeedW < targetSpeedW)
+	{
+		curSpeedW += accW;
+		if(curSpeedW > targetSpeedW)
+			curSpeedW = targetSpeedW;
+	}
+	else if(curSpeedW > targetSpeedW)
+	{
+		curSpeedW -= decW;
 		if(curSpeedW < targetSpeedW)
-		{
-			curSpeedW += accW;
-			if(curSpeedW > targetSpeedW)
-				curSpeedW = targetSpeedW;
-		}
-		else if(curSpeedW > targetSpeedW)
-		{
-			curSpeedW -= decW;
-			if(curSpeedW < targetSpeedW)
-				curSpeedW = targetSpeedW;
-		}
-	//}
+			curSpeedW = targetSpeedW;
+	}
 }
 
 
@@ -225,7 +191,7 @@ void calculateMotorPwm(void) // encoder PD controller
 	sensorFeedback /= SENSOR_SCALE;
 	if (num_run != SEARCH_RUN) sensorFeedback /= 10;
 
-	// Habilita os feedback selecionados
+	// Habilita os feedbacks selecionados
 	if (useEncoderFeedback == true) rotationalFeedback += encoderFeedbackW;
 	if (useGyroFeedback == true) rotationalFeedback += gyroFeedback;
 	if (useSensorFeedback == true) rotationalFeedback += sensorFeedback;
@@ -235,16 +201,15 @@ void calculateMotorPwm(void) // encoder PD controller
 	if (num_run == SEARCH_RUN) posErrorW = curSpeedW - rotationalFeedback;
 	else if (flag_run < RUN_OK) posErrorW += curSpeedW - rotationalFeedback;
 	else posErrorW = 0;
-	//posErrorW += curSpeedW - rotationalFeedback;
 
 	// Controladores PDs para ambos motores
 	posPwmX = KP_X * posErrorX + KD_X * (posErrorX - oldPosErrorX);
 	if (num_run == SEARCH_RUN)
-	{
+	{	// Seguidor de linha
 		posPwmW = ((posErrorW * param_pid_kp) / 128) +  (((posErrorW - oldPosErrorW) * param_pid_kd) / 128);
 	}
 	else
-	{
+	{	// SpeedProfile
 		posPwmW = KP_W * posErrorW + KD_W * (posErrorW - oldPosErrorW);
 	}
 
@@ -285,113 +250,50 @@ void resetProfile(void)
 }
 
 
-void recordsSectors(void)
+void manageRuns(void)
 {
 	static int32_t oldDistance = 0;
 
-	// Registra a distância do trecho e o SpeedW_médio
-	if (num_run == SEARCH_RUN && valid_marker == true)
-	{
-
-		bufferDistances[index_buffer_sector] = distance - oldDistance;
-		bufferSpeedsWm[index_buffer_sector] = accumulatorSpeedW / numSpeedW;
-		oldDistance = distance;
-
-#ifdef SEARCH_RUN_PRINTS
-		printf("D[%d] = %ld\r\n", index_buffer_sector, bufferDistances[index_buffer_sector]);
-		printf("W[%d] = %ld\r\n", index_buffer_sector, bufferSpeedsWm[index_buffer_sector]);
-#endif
-
-		index_buffer_sector++;
-		accumulatorSpeedW = 0;
-		numSpeedW = 0;
-		valid_marker = false;
-	}
-}
-
-void changeRuns(void)
-{
-	static uint32_t delay_start = 0;
-
 	switch (num_run)
 	{
-		case SEARCH_RUN:
-			// Quando o robô parar na linha de chegada: calcula as velocidades do speedProfile
+		case SEARCH_RUN:	// Corrida de de reconhecimento ********************
+			// Registra a distância do trecho e o SpeedW_médio
+			if (valid_marker == true)
+			{
+				bufferDistances[index_buffer_sector] = distance - oldDistance;
+				bufferSpeedsWm[index_buffer_sector] = accumulatorSpeedW / numSpeedW;
+				oldDistance = distance;
+
+#ifdef SEARCH_RUN_PRINTS
+				printf("D[%d] = %ld\r\n", index_buffer_sector, bufferDistances[index_buffer_sector]);
+				printf("W[%d] = %ld\r\n", index_buffer_sector, bufferSpeedsWm[index_buffer_sector]);
+#endif
+
+				index_buffer_sector++;
+				accumulatorSpeedW = 0;
+				numSpeedW = 0;
+				valid_marker = false;
+			}
+
+			// Quando o robô parar na linha de chegada: grava os dados do speedProfile
 			if (flag_run == GOAL_OK && curSpeedX == 0)
 			{
-#ifdef SEARCH_RUN_PRINTS
-				printf("\r\n");
-#endif
-
-				// Calculo dos parametros do speedProfile
-				for (uint8_t i = 0; i < index_buffer_sector; i++)
-				{
-					if (abs(bufferSpeedsWm[i]) < MINIMAL_SX_STRAIGHT)
-					{	// Reta
-						bufferSpeedXout[i] = SPEEDX_TO_COUNTS(param_speedX_max);
-						bufferSpeedWout[i] = 0;
-					}
-					else
-					{	// Curva
-						float ray = ((float)SPEEDX_TO_COUNTS(param_speedX_med) / (float)bufferSpeedsWm[i]);
-						bufferSpeedXout[i] = (int32_t)(sqrtf(ACCC_TO_COUNTS(param_accC) * abs(ray * W_2)));
-						if (bufferSpeedXout[i] > SPEEDX_TO_COUNTS(param_speedX_max)) bufferSpeedXout[i] = SPEEDX_TO_COUNTS(param_speedX_max);
-						bufferSpeedWout[i] = (int32_t)(bufferSpeedXout[i] / ray);
-					}
-#ifdef SEARCH_RUN_PRINTS
-					printf("SX[%d] = %ld\r\n", i, bufferSpeedXout[i]);
-					printf("SW[%d] = %ld\r\n", i, bufferSpeedWout[i]);
-#endif
-				}
-
 				// Cocatena os buffers e grava na flash
 				uint32_t count = 0;
-				memcpy(&buf_temp[count], bufferSpeedXout, 4 * SIZE_BUFFER_SECTORS);
-				count += SIZE_BUFFER_SECTORS;
-				memcpy(&buf_temp[count], bufferSpeedWout, 4 * SIZE_BUFFER_SECTORS);
-				count += SIZE_BUFFER_SECTORS;
 				memcpy(&buf_temp[count], bufferDistances, 4 * SIZE_BUFFER_SECTORS);
-				fflash = true;
+				count += SIZE_BUFFER_SECTORS;
+				memcpy(&buf_temp[count], bufferSpeedsWm, 4 * SIZE_BUFFER_SECTORS);
 				setMotores(0, 0);
 
 				// Atualiza o estado
 				flag_run = RUN_OK;
-				num_run = FAST_RUN1;
-
-				resetProfile();
+				valid_marker = false;
 			}
 			break;
 
 
-		case FAST_RUN1:
-			if (flag_run == RUN_OK)
-			{
-				if (getSW1() == HIGH)
-				{
-					delay_start = 0;
-					flag_run = WAIT;
-					beep(300);
-				}
-			}
-
-			if (flag_run == WAIT)
-			{
-				if (++delay_start == 1000)
-				{
-					useEncoderFeedback = true;
-					useSensorFeedback = true;
-					//useGyroFeedback = true;
-
-					valid_marker = false;
-					index_buffer_sector = 0;
-
-					changeSpeedProfile();
-
-					flag_run = 0;
-				}
-			}
-
-			if (valid_marker == true)
+		case FAST_RUN1:	// Corrida rápida 1 ************************************
+			if (valid_marker == true && flag_run != PAUSE)
 			{
 				index_buffer_sector++;
 				changeSpeedProfile();
@@ -401,17 +303,60 @@ void changeRuns(void)
 
 			if (flag_run == GOAL_OK && curSpeedX == 0)
 			{
+				setMotores(0, 0);
 				flag_run = RUN_OK;
-				num_run = FAST_RUN2;
 			}
 			break;
 
-		case FAST_RUN2:
+		case FAST_RUN2:	// Corrida rápida 2 ************************************
+			if (valid_marker == true && flag_run != PAUSE)
+			{
+				index_buffer_sector++;
+				changeSpeedProfile();
+
+				valid_marker = false;
+			}
+
+			if (flag_run == GOAL_OK && curSpeedX == 0)
+			{
+				setMotores(0, 0);
+				flag_run = RUN_OK;
+				num_run = STOP;
+			}
 			break;
 	}
 }
 
 
+// Calcula os parâmetros do speedProfile a partir dos dados dos trechos
+void calculateSpeedProfile(int32_t topSpeedX, int32_t accC)
+{
+	// Calculo dos parametros do speedProfile
+	for (uint8_t i = 0; i < index_buffer_sector; i++)
+	{
+		if (abs(bufferSpeedsWm[i]) < MINIMAL_SX_STRAIGHT)
+		{	// Reta
+			bufferSpeedXout[i] = SPEEDX_TO_COUNTS(topSpeedX);
+			bufferSpeedWout[i] = 0;
+		}
+		else
+		{	// Curva
+			float ray = ((float)SPEEDX_TO_COUNTS(param_speedX_med) / (float)bufferSpeedsWm[i]);
+			bufferSpeedXout[i] = (int32_t)(sqrtf(ACCC_TO_COUNTS(accC) * abs(ray * W_2)));
+			if (bufferSpeedXout[i] > SPEEDX_TO_COUNTS(topSpeedX)) bufferSpeedXout[i] = SPEEDX_TO_COUNTS(topSpeedX);
+			bufferSpeedWout[i] = (int32_t)(bufferSpeedXout[i] / ray);
+		}
+#ifdef SEARCH_RUN_PRINTS
+		printf("SX[%d] = %ld\r\n", i, bufferSpeedXout[i]);
+		printf("SW[%d] = %ld\r\n", i, bufferSpeedWout[i]);
+#endif
+	}
+
+	index_buffer_sector = 0;
+}
+
+
+// Altera os parâmetros do speedProfile de acordo com os trechos
 void changeSpeedProfile(void)
 {
 	targetSpeedX = bufferSpeedXout[index_buffer_sector];
@@ -424,16 +369,47 @@ void changeSpeedProfile(void)
 }
 
 
+// Lê os valores salvos na flash e carrega nos respectivos buffers
 void updateBufferSpeedProfile(void)
 {
-	uint32_t buf[SIZE_BUFFER_SECTORS * 3];
+	uint32_t buf[SIZE_BUFFER_SECTORS * 2];
 	uint32_t count = 0;
 
-	readFlash(ADDR_FLASH_SECTOR_10, buf, SIZE_BUFFER_SECTORS * 3);
+	readFlash(ADDR_FLASH_SECTOR_10, buf, SIZE_BUFFER_SECTORS * 2);
 
-	memcpy(bufferSpeedXout, &buf[count], 4 * SIZE_BUFFER_SECTORS);
-	count += SIZE_BUFFER_SECTORS;
-	memcpy(bufferSpeedWout, &buf[count], 4 * SIZE_BUFFER_SECTORS);
-	count += SIZE_BUFFER_SECTORS;
 	memcpy(bufferDistances, &buf[count], 4 * SIZE_BUFFER_SECTORS);
+	count += SIZE_BUFFER_SECTORS;
+	memcpy(bufferSpeedsWm, &buf[count], 4 * SIZE_BUFFER_SECTORS);
+
+	index_buffer_sector = SIZE_BUFFER_SECTORS;
+}
+
+
+// Envio de dados ao software LFTrakking
+void writeLFT(void)
+{
+#ifdef LFT_PRINTS	// Buffer de envio ao software LFTrakking
+	// Envia as velocidades (pacotes de 100 contagens - a cada 100ms)
+	//bufferLFT[index_buffer_lft] = leftEncoderChange;
+	//bufferLFT[index_buffer_lft + 1] = rightEncoderChange;
+
+	// Envia a resposta da velocidade SpeedX
+	bufferLFT[index_buffer_lft] = curSpeedX;
+	bufferLFT[index_buffer_lft + 1] = 2 * encoderChange;
+
+	// Envia a resposta da velocidade SpeedW
+	//bufferLFT[index_buffer_lft] = curSpeedW;
+	//bufferLFT[index_buffer_lft + 1] = rotationalFeedback;
+
+	index_buffer_lft += 2;
+	if (index_buffer_lft == 201)// && c_aux < 100)
+	{
+		bufferLFT[0] = 0xAAAAAAAA;
+		HAL_UART_DMAResume(&huart1);
+		HAL_UART_Transmit_DMA(&huart1, (uint8_t*)bufferLFT, 804);
+		index_buffer_lft = 1;
+
+		//c_aux++;
+	}
+#endif
 }

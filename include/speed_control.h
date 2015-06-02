@@ -49,6 +49,8 @@
 #define SEARCH_RUN		0
 #define FAST_RUN1		1
 #define FAST_RUN2		2
+#define PAUSE			9
+#define STOP			10
 
 #define GOAL_OK			4
 #define RUN_OK			5
@@ -81,10 +83,11 @@ void calculateMotorPwm(void);
 int32_t needToDecelerate(int32_t, int32_t, int32_t);
 void resetProfile(void);
 
-void recordsSectors(void);
-void changeRuns(void);
+void manageRuns(void);
+void calculateSpeedProfile(int32_t topSpeedX, int32_t accC);
 void changeSpeedProfile(void);
 void updateBufferSpeedProfile(void);
+void writeLFT(void);
 
 
 /* Variáveis externas --------------------------------------------------------*/
@@ -98,7 +101,6 @@ extern bool useGyroFeedback;
 extern bool useSensorFeedback;
 extern uint8_t num_run;
 extern int32_t buf_temp[3 * SIZE_BUFFER_SECTORS];
-extern bool fflash;
 
 
 #endif /* __SPEED_CONTROL_H */

@@ -48,10 +48,12 @@
 void systick(void);
 void perifericosConfig(void);
 void init_parametros(void);
+void initializeRun(void);
+void recordSectors(void);
 
-extern int32_t param_speedX_med, param_speedX_min, param_speedX_max;
-extern int32_t param_accX, param_accC, param_a, param_b;
-extern int32_t param_pid_kp, param_pid_ki, param_pid_kd, param_pid_offset;
+extern int32_t param_speedX_med, param_topSpeed1, param_topSpeed2;
+extern int32_t param_pid_kp, param_pid_kd, param_scale_sensor, param_scale_gyro;
+extern int32_t param_accX1, param_accC1, param_accX2, param_accC2;
 
 
 #endif /* __MAIN_H */

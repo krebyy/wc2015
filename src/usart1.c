@@ -128,9 +128,9 @@ int32_t comandosUART(void)
 			checksum = 0;
 			for (i = 0; i < N_PARAMETROS; i++) checksum += buf[i];
 
-			printf("%d_%d_%d_%d_%d_%d_%d_%d_%d_%d_%d_%d\n", buf[0], buf[1],
-					buf[2], buf[3], buf[4], buf[5], buf[6], buf[7], buf[8],
-					buf[9], buf[10], checksum);
+			printf("%ld_%ld_%ld_%ld_%ld_%ld_%ld_%ld_%ld_%ld_%ld_%ld\n",
+					buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6],
+					buf[7], buf[8], buf[9], buf[10], checksum);
 
 			//printf("Dados enviados com sucesso, checksum = %d\r\n", checksum);
 		}
@@ -161,7 +161,7 @@ int32_t comandosUART(void)
 			{
 				writeFlash(ADDR_FLASH_SECTOR_11, buf, N_PARAMETROS);
 				init_parametros();
-				printf("Dados recebidos com sucesso, checksum = %d\r\n", checksum);
+				printf("Dados recebidos com sucesso, checksum = %ld\r\n", checksum);
 				beep(100);
 			}
 			else
