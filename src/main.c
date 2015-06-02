@@ -83,9 +83,14 @@ int main (void)
 
 	if (num_run == SEARCH_RUN)
 	{
-		targetSpeedX = SPEEDX_TO_COUNTS(param_speedX_med);//param_speedX_med);
-		accX = decX = ACCX_TO_COUNTS(param_accX);//param_accX);
-		distanceLeft = MM_TO_COUNTS(13155);
+		useEncoderFeedback = false;
+		useGyroFeedback = false;
+		useSensorFeedback = true;
+
+		targetSpeedX = SPEEDX_TO_COUNTS(param_speedX_med);
+		accX = decX = 2;//ACCX_TO_COUNTS(500);//param_accX);
+		accW = decW = 2;
+		distanceLeft = MM_TO_COUNTS(10000);
 	}
 	else if (num_run == FAST_RUN1)
 	{
@@ -93,6 +98,7 @@ int main (void)
 		useSensorFeedback = true;
 		//useGyroFeedback = true;
 
+		updateBufferSpeedProfile();
 		changeSpeedProfile();
 	}
 

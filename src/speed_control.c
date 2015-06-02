@@ -21,6 +21,7 @@ int32_t leftEncoderOld = 0, rightEncoderOld = 0;
 int32_t leftEncoderCount = 0, rightEncoderCount = 0;
 int32_t distance = 0;
 
+int32_t rotationalFeedback = 0;
 int32_t oldPosErrorX = 0, posErrorX = 0;
 int32_t oldPosErrorW = 0, posErrorW = 0;
 
@@ -59,7 +60,7 @@ int32_t buf_temp[3 * SIZE_BUFFER_SECTORS];
 bool fflash = false;
 
 /* Definições do programa ----------------------------------------------------*/
-#define LFT_PRINTS	// Habilita o envio dos valores para o software LFTrakking
+//#define LFT_PRINTS	// Habilita o envio dos valores para o software LFTrakking
 //#define SEARCH_RUN_PRINTS	// Habilita mensagens de debug da searchRun
 //#define FAST_RUNS_PRINTS	// Habilita mensagens de debug para as fastRuns
 
@@ -106,8 +107,13 @@ void speedProfile(void)
 	//bufferLFT[index_buffer_counts] = leftEncoderChange;
 	//bufferLFT[index_buffer_counts + 1] = rightEncoderChange;
 
+	// Envia a resposta da velocidade SpeedX
 	bufferLFT[index_buffer_counts] = curSpeedX;
-	bufferLFT[index_buffer_counts + 1] = encoderChange;
+	bufferLFT[index_buffer_counts + 1] = 2 * encoderChange;
+
+	// Envia a resposta da velocidade SpeedW
+	//bufferLFT[index_buffer_counts] = curSpeedW;
+	//bufferLFT[index_buffer_counts + 1] = rotationalFeedback;
 
 	index_buffer_counts += 2;
 	if (index_buffer_counts == 201)// && c_aux < 100)
@@ -149,11 +155,12 @@ void getEncoderStatus(void)
 
 void updateCurrentSpeed(void)
 {
-	if (targetSpeedW == 0)
-	{
+	//if (targetSpeedW == 0)
+	//{
 		if (needToDecelerate(distanceLeft, curSpeedX, endSpeedX) > decX)
 		{
 			targetSpeedX = endSpeedX;
+			targetSpeedW = endSpeedW;
 		}
 		if(curSpeedX < targetSpeedX)
 		{
@@ -167,13 +174,13 @@ void updateCurrentSpeed(void)
 			if(curSpeedX < targetSpeedX)
 				curSpeedX = targetSpeedX;
 		}
-	}
-	else
-	{
-		if (needToDecelerate(distanceLeft, curSpeedW, endSpeedW) > decW)
-		{
-			targetSpeedW = endSpeedW;
-		}
+	//}
+	//else
+	//{
+		//if (needToDecelerate(distanceLeft, curSpeedW, endSpeedW) > decW)
+		//{
+		//	targetSpeedW = endSpeedW;
+		//}
 		if(curSpeedW < targetSpeedW)
 		{
 			curSpeedW += accW;
@@ -186,18 +193,19 @@ void updateCurrentSpeed(void)
 			if(curSpeedW < targetSpeedW)
 				curSpeedW = targetSpeedW;
 		}
-	}
+	//}
 }
 
 
 void calculateMotorPwm(void) // encoder PD controller
 {
-	int32_t rotationalFeedback = 0;
 	int32_t gyroFeedback;
 	int32_t sensorFeedback;
 
 	int32_t encoderFeedbackX, encoderFeedbackW;
 	int32_t posPwmX, posPwmW;
+
+	rotationalFeedback = 0;
 
     // Feedbacks dos encoders
 	encoderFeedbackX = rightEncoderChange + leftEncoderChange;
@@ -215,9 +223,10 @@ void calculateMotorPwm(void) // encoder PD controller
 	if (sensorFeedback == INFINITO) sensorFeedback = oldSensorError;
 	oldSensorError = sensorFeedback;
 	sensorFeedback /= SENSOR_SCALE;
+	if (num_run != SEARCH_RUN) sensorFeedback /= 10;
 
 	// Habilita os feedback selecionados
-	if (useEncoderFeedback == true) rotationalFeedback += sensorFeedback;
+	if (useEncoderFeedback == true) rotationalFeedback += encoderFeedbackW;
 	if (useGyroFeedback == true) rotationalFeedback += gyroFeedback;
 	if (useSensorFeedback == true) rotationalFeedback += sensorFeedback;
 
@@ -226,11 +235,18 @@ void calculateMotorPwm(void) // encoder PD controller
 	if (num_run == SEARCH_RUN) posErrorW = curSpeedW - rotationalFeedback;
 	else if (flag_run < RUN_OK) posErrorW += curSpeedW - rotationalFeedback;
 	else posErrorW = 0;
-	//posErrorW = curSpeedW - rotationalFeedback;
+	//posErrorW += curSpeedW - rotationalFeedback;
 
 	// Controladores PDs para ambos motores
 	posPwmX = KP_X * posErrorX + KD_X * (posErrorX - oldPosErrorX);
-	posPwmW = ((posErrorW * param_pid_kp) / 128) +  (((posErrorW - oldPosErrorW) * param_pid_kd) / 128);
+	if (num_run == SEARCH_RUN)
+	{
+		posPwmW = ((posErrorW * param_pid_kp) / 128) +  (((posErrorW - oldPosErrorW) * param_pid_kd) / 128);
+	}
+	else
+	{
+		posPwmW = KP_W * posErrorW + KD_W * (posErrorW - oldPosErrorW);
+	}
 
 	oldPosErrorX = posErrorX;
 	oldPosErrorW = posErrorW;
@@ -271,7 +287,7 @@ void resetProfile(void)
 
 void recordsSectors(void)
 {
-	static oldDistance = 0;
+	static int32_t oldDistance = 0;
 
 	// Registra a distância do trecho e o SpeedW_médio
 	if (num_run == SEARCH_RUN && valid_marker == true)
@@ -405,4 +421,19 @@ void changeSpeedProfile(void)
 	endSpeedW = bufferSpeedWout[index_buffer_sector + 1];
 
 	distanceLeft = bufferDistances[index_buffer_sector];
+}
+
+
+void updateBufferSpeedProfile(void)
+{
+	uint32_t buf[SIZE_BUFFER_SECTORS * 3];
+	uint32_t count = 0;
+
+	readFlash(ADDR_FLASH_SECTOR_10, buf, SIZE_BUFFER_SECTORS * 3);
+
+	memcpy(bufferSpeedXout, &buf[count], 4 * SIZE_BUFFER_SECTORS);
+	count += SIZE_BUFFER_SECTORS;
+	memcpy(bufferSpeedWout, &buf[count], 4 * SIZE_BUFFER_SECTORS);
+	count += SIZE_BUFFER_SECTORS;
+	memcpy(bufferDistances, &buf[count], 4 * SIZE_BUFFER_SECTORS);
 }

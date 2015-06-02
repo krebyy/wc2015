@@ -17,10 +17,10 @@
 #include "main.h"
 
 /* Constantes ----------------------------------------------------------------*/
-#define KP_X 0.05
-#define KD_X 0.3
-#define KP_W 0.2
-#define KD_W 0
+#define KP_X 2
+#define KD_X 6
+#define KP_W 1
+#define KD_W 3
 
 #define TS 1	// Tempo de atualização em [ms]
 
@@ -57,12 +57,12 @@
 
 /* Macros --------------------------------------------------------------------*/
 #define MM_TO_COUNTS(mm)	(((mm) * CNT_PER_1000MM) / 1000)
-#define SPEEDX_TO_COUNTS(speed)	((CNT_PER_1000MM * (speed * 2) * TS) / 1000000)
-#define ACCX_TO_COUNTS(acc)		(SPEEDX_TO_COUNTS(acc / 2) / TS)
+#define SPEEDX_TO_COUNTS(speed)	((CNT_PER_1000MM * (speed) * 2 * TS) / 1000000)
+#define ACCX_TO_COUNTS(acc)		(SPEEDX_TO_COUNTS(acc) / (TS * 1000))
 #define COUNTS_TO_MM(cnt)	(((cnt) * 1000) / CNT_PER_1000MM)
 
 #define DEG_TO_COUNTS(deg)	(((deg) * CNT_PER_360DEG) / 360)
-#define SPEEDW_TO_COUNTS(speed)	((CNT_PER_360DEG * (speed * 2) * TS) / 360000)
+#define SPEEDW_TO_COUNTS(speed)	((CNT_PER_360DEG * (speed) * 2 * TS) / 360000)
 #define ACCW_TO_COUNTS(acc)		(SPEEDW_TO_COUNTS(acc / 2) / TS)
 #define COUNTS_TO_DEG(cnt)	(((cnt) * 360) / CNT_PER_360DEG)
 
@@ -84,6 +84,7 @@ void resetProfile(void);
 void recordsSectors(void);
 void changeRuns(void);
 void changeSpeedProfile(void);
+void updateBufferSpeedProfile(void);
 
 
 /* Variáveis externas --------------------------------------------------------*/
