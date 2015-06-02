@@ -334,6 +334,8 @@ void calculateSpeedProfile(int32_t topSpeedX, int32_t accC)
 	// Calculo dos parametros do speedProfile
 	for (uint8_t i = 0; i <= index_buffer_sector; i++)
 	{
+		if (i == SIZE_BUFFER_SECTORS) break;
+
 		if (abs(bufferSpeedsWm[i]) < MINIMAL_SX_STRAIGHT)
 		{	// Reta
 			bufferSpeedXout[i] = SPEEDX_TO_COUNTS(topSpeedX);
