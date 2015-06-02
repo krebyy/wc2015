@@ -68,7 +68,7 @@
 #define ACCW_TO_COUNTS(acc)		(SPEEDW_TO_COUNTS(acc / 2) / TS)
 #define COUNTS_TO_DEG(cnt)	(((cnt) * 360) / CNT_PER_360DEG)
 
-#define ACCC_TO_COUNTS(acc) (float)((float)acc / 1768.6351f)
+#define ACCC_TO_COUNTS(acc) (float)((float)acc / 1755.6180f)
 
 #define W_2		(float)((float)MM_TO_COUNTS(W_DISTANCE) / 2.0f)
 

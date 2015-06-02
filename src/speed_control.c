@@ -189,7 +189,7 @@ void calculateMotorPwm(void) // encoder PD controller
 	if (sensorFeedback == INFINITO) sensorFeedback = oldSensorError;
 	oldSensorError = sensorFeedback;
 	sensorFeedback /= SENSOR_SCALE;
-	if (num_run != SEARCH_RUN) sensorFeedback /= 10;
+	if (num_run != SEARCH_RUN) sensorFeedback /= param_scale_sensor;
 
 	// Habilita os feedbacks selecionados
 	if (useEncoderFeedback == true) rotationalFeedback += encoderFeedbackW;
@@ -293,7 +293,7 @@ void manageRuns(void)
 
 
 		case FAST_RUN1:	// Corrida rápida 1 ************************************
-			if (valid_marker == true && flag_run != PAUSE)
+			if (valid_marker == true && flag_run != PAUSE && flag_run != GOAL_OK)
 			{
 				index_buffer_sector++;
 				changeSpeedProfile();
@@ -309,7 +309,7 @@ void manageRuns(void)
 			break;
 
 		case FAST_RUN2:	// Corrida rápida 2 ************************************
-			if (valid_marker == true && flag_run != PAUSE)
+			if (valid_marker == true && flag_run != PAUSE && flag_run != GOAL_OK)
 			{
 				index_buffer_sector++;
 				changeSpeedProfile();
@@ -332,7 +332,7 @@ void manageRuns(void)
 void calculateSpeedProfile(int32_t topSpeedX, int32_t accC)
 {
 	// Calculo dos parametros do speedProfile
-	for (uint8_t i = 0; i < index_buffer_sector; i++)
+	for (uint8_t i = 0; i <= index_buffer_sector; i++)
 	{
 		if (abs(bufferSpeedsWm[i]) < MINIMAL_SX_STRAIGHT)
 		{	// Reta
@@ -366,6 +366,7 @@ void changeSpeedProfile(void)
 	endSpeedW = bufferSpeedWout[index_buffer_sector + 1];
 
 	distanceLeft = bufferDistances[index_buffer_sector];
+	//if (targetSpeedW != 0) distanceLeft *= 2;  *** Adicionar ganho de distancia !!!!!!!
 }
 
 
