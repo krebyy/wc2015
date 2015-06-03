@@ -82,6 +82,8 @@ int main (void)
 	delay_ms(1000);
 
 
+	//num_run = CAL_GYRO;	// Habilita para calibrar o giroscópio
+
 	// Seleciona os parâmetros da respectiva corrida (searchRun, fastRun1 e fastRun2)
 	initializeRun();
 
@@ -121,7 +123,7 @@ int main (void)
 
 					useEncoderFeedback = true;
 					useSensorFeedback = true;
-					useGyroFeedback = false;
+					useGyroFeedback = true;
 
 					valid_marker = false;
 
@@ -153,7 +155,7 @@ int main (void)
 
 					useEncoderFeedback = true;
 					useSensorFeedback = true;
-					useGyroFeedback = false;
+					useGyroFeedback = true;
 
 					valid_marker = false;
 
@@ -167,6 +169,18 @@ int main (void)
 
 			case STOP:
 				run = false;
+				break;
+
+			case CAL_GYRO:
+				if (ticks >= 1000 && run == true)
+				{
+					toggleLED(LED5);
+					printf("Gyro RAW: %ld\r\n", acumulator_aSpeed / numSamplesGyro);
+
+					acumulator_aSpeed = 0;
+					numSamplesGyro = 0;
+					ticks = 0;
+				}
 				break;
 		}
 
@@ -282,7 +296,7 @@ void initializeRun(void)
 		case FAST_RUN1:	// Corrida rápida 1 ************************************
 			useEncoderFeedback = true;
 			useSensorFeedback = true;
-			useGyroFeedback = false;
+			useGyroFeedback = true;
 
 			updateBufferSpeedProfile();
 			calculateSpeedProfile(param_topSpeed1, param_accC1);
@@ -293,11 +307,22 @@ void initializeRun(void)
 		case FAST_RUN2:	// Corrida rápida 2 ************************************
 			useEncoderFeedback = true;
 			useSensorFeedback = true;
-			useGyroFeedback = false;
+			useGyroFeedback = true;
 
 			updateBufferSpeedProfile();
 			calculateSpeedProfile(param_topSpeed2, param_accC2);
 			changeSpeedProfile();
+			break;
+
+
+		case CAL_GYRO:
+			useEncoderFeedback = true;
+			useSensorFeedback = false;
+			useGyroFeedback = false;
+
+			targetSpeedX = 0;
+			targetSpeedW = SPEEDX_TO_COUNTS(param_scale_gyro);
+			distanceLeft = MM_TO_COUNTS(10000);
 			break;
 	}
 }

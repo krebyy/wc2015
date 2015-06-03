@@ -43,6 +43,8 @@ ADC_HandleTypeDef hadc1;
 /* Variáveis externas --------------------------------------------------------*/
 bool valid_marker = false;
 int32_t flag_run = 0;
+int32_t acumulator_aSpeed = 0, angle = 0;
+int32_t numSamplesGyro = 0;
 
 
 /**
@@ -147,6 +149,10 @@ int32_t getSensorError(void)
 		}
 		elapse_us(i, t0);
 
+		// Leitura do giroscópio
+		acumulator_aSpeed += getRawGyro();
+		numSamplesGyro++;
+
 		// Realiza a leitura de todos os sensores de linha, os sensores das
 		// extremidades pussuem peso maior, no final é realizada a média ponderada
 		if(HAL_GPIO_ReadPin(LINE1_PORT, LINE1_PIN) == LINHA)
@@ -200,6 +206,11 @@ int32_t getSensorError(void)
 			HAL_GPIO_WritePin(R_MARK_E_PORT, R_MARK_E_PIN, LOW);
 		}
 		elapse_us(i * 2, t0);
+
+
+		// Leitura do giroscópio
+		acumulator_aSpeed += getRawGyro();
+		numSamplesGyro++;
 	}
 
 
@@ -310,13 +321,23 @@ void readMarkers(void)
   * @param Nenhum
   * @return w: Velocidade angular
   */
-int32_t getGyro()
+int32_t getRawGyro()
 {
 	int32_t w = 0;
 
 	w = getRawADC(G_OUTZ_CH) - getRawADC(G_VREF_CH);
 
 	return w;
+}
+
+int32_t getGyro()
+{
+	int32_t raw_aSpeed = acumulator_aSpeed / numSamplesGyro;
+
+	acumulator_aSpeed = 0;
+	numSamplesGyro = 0;
+
+	return (int32_t)T_GYRO(raw_aSpeed);
 }
 
 

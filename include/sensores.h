@@ -75,11 +75,16 @@
 #define VBAT_RAW	3434
 #define VBAT_V		8270
 
+
+/* Macros ------------------------------------------------------------------- */
+#define T_GYRO(x) (1.0679 * x - 11.214)
+
+
 /* Protótipos das Funções --------------------------------------------------- */
 void sensoresConfig(void);
 int32_t getSensorError(void);
 void readMarkers(void);
-int32_t getGyro();
+int32_t getRawGyro();
 int32_t getTensao();
 uint32_t getRawADC(uint32_t canal);
 
@@ -87,6 +92,8 @@ uint32_t getRawADC(uint32_t canal);
 /* Variáveis externas --------------------------------------------------------*/
 extern bool valid_marker;
 extern int32_t flag_run;
+extern int32_t acumulator_aSpeed, angle;
+extern int32_t numSamplesGyro;
 
 
 #endif /* __SENSORES_H */

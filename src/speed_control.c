@@ -180,16 +180,16 @@ void calculateMotorPwm(void) // encoder PD controller
 	accumulatorSpeedW += encoderFeedbackW;
 	numSpeedW++;
 
-	// Leitura do giroscópio
-	//gyroFeedback = getGyro() / GYRO_SCALE;
-	gyroFeedback = 0;
-
 	// Leitura dos sensores de linha
 	sensorFeedback = getSensorError();
 	if (sensorFeedback == INFINITO) sensorFeedback = oldSensorError;
 	oldSensorError = sensorFeedback;
 	sensorFeedback /= SENSOR_SCALE;
 	if (num_run != SEARCH_RUN) sensorFeedback /= param_scale_sensor;
+
+	// Leitura do giroscópio
+	gyroFeedback = getGyro() / GYRO_SCALE;
+	gyroFeedback = 0;
 
 	// Habilita os feedbacks selecionados
 	if (useEncoderFeedback == true) rotationalFeedback += encoderFeedbackW;

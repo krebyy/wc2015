@@ -51,6 +51,7 @@
 #define FAST_RUN2		2
 #define PAUSE			9
 #define STOP			10
+#define CAL_GYRO		66
 
 #define GOAL_OK			4
 #define RUN_OK			5
