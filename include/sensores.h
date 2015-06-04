@@ -23,7 +23,7 @@
 #define LINHA	GPIO_PIN_RESET	// RESET (linha branca); SET (linha preta)
 #define INFINITO	8888		// Valor que indica a não identificação de linha
 
-#define MARKER_TH	5
+#define MARKER_TH	4
 
 #define SENSORES_CLK	__GPIOA_CLK_ENABLE(); __GPIOB_CLK_ENABLE(); __GPIOC_CLK_ENABLE(); __GPIOD_CLK_ENABLE()
 
@@ -84,8 +84,9 @@
 void sensoresConfig(void);
 int32_t getSensorError(void);
 void readMarkers(void);
-int32_t getRawGyro();
-int32_t getTensao();
+int32_t getRawGyro(void);
+int32_t getGyro(void);
+int32_t getTensao(void);
 uint32_t getRawADC(uint32_t canal);
 
 

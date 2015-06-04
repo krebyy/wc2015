@@ -123,7 +123,7 @@ int main (void)
 
 					useEncoderFeedback = true;
 					useSensorFeedback = true;
-					useGyroFeedback = true;
+					useGyroFeedback = false;
 
 					valid_marker = false;
 
@@ -278,8 +278,8 @@ void init_parametros(void)
 
 void initializeRun(void)
 {
-	accX = decX = 2;//ACCX_TO_COUNTS(500);//param_accX);
-	accW = decW = 2;
+	accX = decX = 1;//ACCX_TO_COUNTS(500);//param_accX);
+	accW = decW = 1;
 
 	switch (num_run)
 	{
@@ -296,7 +296,7 @@ void initializeRun(void)
 		case FAST_RUN1:	// Corrida rápida 1 ************************************
 			useEncoderFeedback = true;
 			useSensorFeedback = true;
-			useGyroFeedback = true;
+			useGyroFeedback = false;
 
 			updateBufferSpeedProfile();
 			calculateSpeedProfile(param_topSpeed1, param_accC1);
@@ -307,7 +307,7 @@ void initializeRun(void)
 		case FAST_RUN2:	// Corrida rápida 2 ************************************
 			useEncoderFeedback = true;
 			useSensorFeedback = true;
-			useGyroFeedback = true;
+			useGyroFeedback = false;
 
 			updateBufferSpeedProfile();
 			calculateSpeedProfile(param_topSpeed2, param_accC2);

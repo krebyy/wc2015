@@ -280,7 +280,7 @@ void readMarkers(void)
     if (marker_intersection == false && fmarker == true && marker_corner == 0)
     {	// corner marker fix
 		fmarker = false;
-		beep(50);
+		beep(20);
 
 		valid_marker = true;
     }
@@ -293,7 +293,7 @@ void readMarkers(void)
     if (flag_run == 1 && marker_start_goal == 0)
     {	// start marker fix
 		flag_run=2;
-		beep(200);
+		beep(100);
 
 		valid_marker = true;
     }
@@ -308,7 +308,7 @@ void readMarkers(void)
     if (flag_run == 3 && marker_start_goal == 0)
     {	// goal marker fix
 		flag_run = GOAL_OK;
-		beep(200);
+		beep(100);
 		distanceLeft = MM_TO_COUNTS(150);
 		endSpeedX = 0;
 

@@ -19,8 +19,8 @@
 /* Constantes ----------------------------------------------------------------*/
 #define KP_X 2
 #define KD_X 6
-#define KP_W 1
-#define KD_W 3
+#define KP_W 5	//1
+#define KD_W 15//15	//3
 
 #define TS 1	// Tempo de atualização em [ms]
 

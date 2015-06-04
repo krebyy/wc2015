@@ -42,6 +42,9 @@ int32_t bufferSpeedXout[SIZE_BUFFER_SECTORS] = {0};
 int32_t bufferSpeedWout[SIZE_BUFFER_SECTORS] = {0};
 
 
+int32_t encoderFeedbackX, encoderFeedbackW;
+
+
 /* Variáveis externas --------------------------------------------------------*/
 int32_t distanceLeft = 0, distance_mm = 0;
 int32_t targetSpeedX = 0, targetSpeedW = 0;
@@ -58,7 +61,7 @@ int32_t buf_temp[3 * SIZE_BUFFER_SECTORS];
 
 /* Definições do programa ----------------------------------------------------*/
 //#define LFT_PRINTS	// Habilita o envio dos valores para o software LFTrakking
-#define SEARCH_RUN_PRINTS	// Habilita mensagens de debug da searchRun
+//#define SEARCH_RUN_PRINTS	// Habilita mensagens de debug da searchRun
 //#define FAST_RUNS_PRINTS	// Habilita mensagens de debug para as fastRuns
 
 
@@ -168,7 +171,7 @@ void calculateMotorPwm(void) // encoder PD controller
 	int32_t gyroFeedback;
 	int32_t sensorFeedback;
 
-	int32_t encoderFeedbackX, encoderFeedbackW;
+	//int32_t encoderFeedbackX, encoderFeedbackW;
 	int32_t posPwmX, posPwmW;
 
 	rotationalFeedback = 0;
@@ -185,11 +188,15 @@ void calculateMotorPwm(void) // encoder PD controller
 	if (sensorFeedback == INFINITO) sensorFeedback = oldSensorError;
 	oldSensorError = sensorFeedback;
 	sensorFeedback /= SENSOR_SCALE;
-	if (num_run != SEARCH_RUN) sensorFeedback /= param_scale_sensor;
+	if (num_run != SEARCH_RUN)
+	{
+		sensorFeedback /= param_scale_sensor;
+		if (targetSpeedW == 0) sensorFeedback /= 2;
+	}
 
 	// Leitura do giroscópio
-	gyroFeedback = getGyro() / GYRO_SCALE;
-	gyroFeedback = 0;
+	gyroFeedback = getGyro() / param_scale_gyro;
+	if (targetSpeedW == 0) gyroFeedback = 0; // Ignora o gyro nas retas
 
 	// Habilita os feedbacks selecionados
 	if (useEncoderFeedback == true) rotationalFeedback += encoderFeedbackW;
@@ -345,7 +352,7 @@ void calculateSpeedProfile(int32_t topSpeedX, int32_t accC)
 		{	// Curva
 			float ray = ((float)SPEEDX_TO_COUNTS(param_speedX_med) / (float)bufferSpeedsWm[i]);
 			bufferSpeedXout[i] = (int32_t)(sqrtf(ACCC_TO_COUNTS(accC) * abs(ray * W_2)));
-			if (bufferSpeedXout[i] > SPEEDX_TO_COUNTS(topSpeedX)) bufferSpeedXout[i] = SPEEDX_TO_COUNTS(topSpeedX);
+			if (bufferSpeedXout[i] > SPEEDX_TO_COUNTS(1200)) bufferSpeedXout[i] = SPEEDX_TO_COUNTS(1200); //topSpeedX
 			bufferSpeedWout[i] = (int32_t)(bufferSpeedXout[i] / ray);
 		}
 #ifdef SEARCH_RUN_PRINTS
@@ -366,9 +373,10 @@ void changeSpeedProfile(void)
 
 	targetSpeedW = bufferSpeedWout[index_buffer_sector];
 	endSpeedW = bufferSpeedWout[index_buffer_sector + 1];
+	if (targetSpeedW  == 0) endSpeedW = 0;
 
 	distanceLeft = bufferDistances[index_buffer_sector];
-	//if (targetSpeedW != 0) distanceLeft *= 2;  *** Adicionar ganho de distancia !!!!!!!
+	if (targetSpeedW != 0) distanceLeft *= 2;  // Prioriza a marca nas curvas
 }
 
 
@@ -393,16 +401,16 @@ void writeLFT(void)
 {
 #ifdef LFT_PRINTS	// Buffer de envio ao software LFTrakking
 	// Envia as velocidades (pacotes de 100 contagens - a cada 100ms)
-	//bufferLFT[index_buffer_lft] = leftEncoderChange;
-	//bufferLFT[index_buffer_lft + 1] = rightEncoderChange;
+	bufferLFT[index_buffer_lft] = leftEncoderChange;
+	bufferLFT[index_buffer_lft + 1] = rightEncoderChange;
 
 	// Envia a resposta da velocidade SpeedX
-	bufferLFT[index_buffer_lft] = curSpeedX;
-	bufferLFT[index_buffer_lft + 1] = 2 * encoderChange;
+	//bufferLFT[index_buffer_lft] = curSpeedX;
+	//bufferLFT[index_buffer_lft + 1] = 2 * encoderChange;
 
 	// Envia a resposta da velocidade SpeedW
 	//bufferLFT[index_buffer_lft] = curSpeedW;
-	//bufferLFT[index_buffer_lft + 1] = rotationalFeedback;
+	//bufferLFT[index_buffer_lft + 1] = encoderFeedbackW;
 
 	index_buffer_lft += 2;
 	if (index_buffer_lft == 201)// && c_aux < 100)
